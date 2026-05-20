@@ -1,0 +1,209 @@
+ERROR: connectDB is not defined
+Stack: ReferenceError: connectDB is not defined
+    at POST (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__6074d3fd._.js:309:9)
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:59:14)
+    at AppRouteRouteModule.do (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37945)
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:47941
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\trace\tracer.js:185:36
+    at NoopContextManager.with (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NoopTracer.startActiveSpan (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18093)
+    at ProxyTracer.startActiveSpan (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:18854)
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\trace\tracer.js:154:103
+    at NoopContextManager.with (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:7062)
+    at ContextAPI.with (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\@opentelemetry\api\index.js:1:518)
+    at NextTracerImpl.trace (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\trace\tracer.js:154:28)
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:47780
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45275
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45232
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:63:14)
+    at AppRouteRouteModule.handle (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45186)
+
+[2026-02-24T06:59:01.687Z] POST /api/teams
+User: 699ae7fe0cb7b42a03bdd000
+Body: {
+  "name": "CSK",
+  "captain": "MS Doni",
+  "logoUrl": "/uploads/1771911818003-usljpwlbdq8.jpg",
+  "players": [
+    {
+      "name": "sfdf"
+    }
+  ],
+  "createdBy": "699ae7fe0cb7b42a03bdd000"
+}
+ERROR: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+Stack: MongoServerError: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+    at InsertOneOperation.handleOk (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:216:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async executeOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:400:16)
+    at async model.save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:614:5)
+    at async D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2750:9
+    at async Promise.all (index 0)
+    at async model.create (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2735:11)
+    at async POST (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__ce902e4e._.js:396:22)
+    at async AppRouteRouteModule.do (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17776:38)
+    at async AppRouteRouteModule.handleResponse (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187713)
+    at async handleResponse (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17839:32)
+    at async Module.handler (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17892:13)
+    at async DevServer.renderToResponseWithComponentsImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1422:9)
+    at async DevServer.renderPageComponent (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1524:32)
+    at async DevServer.pipeImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1018:25)
+    at async NextNodeServer.handleCatchallRenderRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\next-server.js:395:17)
+    at async DevServer.handleRequestImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:909:17)
+    at async D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+    at async Span.traceAsyncFn (D:\sem-4 project\CricVerse\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+    at async invokeRender (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:248:21)
+    at async handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:447:24)
+    at async requestHandlerImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:496:13)
+    at async Server.requestListener (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\start-server.js:226:13)
+
+[2026-02-24T06:59:02.089Z] POST /api/teams
+User: 699ae7fe0cb7b42a03bdd000
+Body: {
+  "name": "CSK",
+  "captain": "MS Doni",
+  "logoUrl": "/uploads/1771911818003-usljpwlbdq8.jpg",
+  "players": [
+    {
+      "name": "sfdf"
+    }
+  ],
+  "createdBy": "699ae7fe0cb7b42a03bdd000"
+}
+ERROR: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+Stack: MongoServerError: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+    at InsertOneOperation.handleOk (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:216:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async executeOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:400:16)
+    at async model.save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:614:5)
+    at async D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2750:9
+    at async Promise.all (index 0)
+    at async model.create (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2735:11)
+    at async POST (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__ce902e4e._.js:396:22)
+    at async AppRouteRouteModule.do (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17776:38)
+    at async AppRouteRouteModule.handleResponse (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187713)
+    at async handleResponse (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17839:32)
+    at async Module.handler (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17892:13)
+    at async DevServer.renderToResponseWithComponentsImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1422:9)
+    at async DevServer.renderPageComponent (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1524:32)
+    at async DevServer.pipeImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1018:25)
+    at async NextNodeServer.handleCatchallRenderRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\next-server.js:395:17)
+    at async DevServer.handleRequestImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:909:17)
+    at async D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+    at async Span.traceAsyncFn (D:\sem-4 project\CricVerse\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+    at async invokeRender (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:248:21)
+    at async handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:447:24)
+    at async requestHandlerImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:496:13)
+    at async Server.requestListener (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\start-server.js:226:13)
+
+[2026-02-24T06:59:03.126Z] POST /api/teams
+User: 699ae7fe0cb7b42a03bdd000
+Body: {
+  "name": "CSK",
+  "captain": "MS Doni",
+  "logoUrl": "/uploads/1771911818003-usljpwlbdq8.jpg",
+  "players": [
+    {
+      "name": "sfdf"
+    }
+  ],
+  "createdBy": "699ae7fe0cb7b42a03bdd000"
+}
+ERROR: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+Stack: MongoServerError: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+    at InsertOneOperation.handleOk (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:216:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async executeOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:400:16)
+    at async model.save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:614:5)
+    at async D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2750:9
+    at async Promise.all (index 0)
+    at async model.create (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2735:11)
+    at async POST (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__ce902e4e._.js:396:22)
+    at async AppRouteRouteModule.do (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17776:38)
+    at async AppRouteRouteModule.handleResponse (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187713)
+    at async handleResponse (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17839:32)
+    at async Module.handler (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17892:13)
+    at async DevServer.renderToResponseWithComponentsImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1422:9)
+    at async DevServer.renderPageComponent (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1524:32)
+    at async DevServer.pipeImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1018:25)
+    at async NextNodeServer.handleCatchallRenderRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\next-server.js:395:17)
+    at async DevServer.handleRequestImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:909:17)
+    at async D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+    at async Span.traceAsyncFn (D:\sem-4 project\CricVerse\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+    at async invokeRender (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:248:21)
+    at async handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:447:24)
+    at async requestHandlerImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:496:13)
+    at async Server.requestListener (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\start-server.js:226:13)
+
+[2026-02-24T07:00:01.806Z] POST /api/teams
+User: 699ae7fe0cb7b42a03bdd000
+Body: {
+  "name": "CSK",
+  "captain": "MS Doni",
+  "logoUrl": "/uploads/1771916390832-i7ux9kmln1.jpg",
+  "players": [
+    {
+      "name": "c1"
+    },
+    {
+      "name": "c2"
+    }
+  ],
+  "createdBy": "699ae7fe0cb7b42a03bdd000"
+}
+ERROR: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+Stack: MongoServerError: E11000 duplicate key error collection: cricverse.teams index: name_1 dup key: { name: "CSK" }
+    at InsertOneOperation.handleOk (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\insert.js:51:19)
+    at tryOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:216:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async executeOperation (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\operations\execute_operation.js:80:16)
+    at async Collection.insertOne (D:\sem-4 project\CricVerse\node_modules\mongodb\lib\collection.js:154:16)
+    at async model.$__save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:400:16)
+    at async model.save (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:614:5)
+    at async D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2750:9
+    at async Promise.all (index 0)
+    at async model.create (D:\sem-4 project\CricVerse\node_modules\mongoose\lib\model.js:2735:11)
+    at async POST (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__ce902e4e._.js:396:22)
+    at async AppRouteRouteModule.do (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17776:38)
+    at async AppRouteRouteModule.handleResponse (D:\sem-4 project\CricVerse\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:187713)
+    at async handleResponse (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17839:32)
+    at async Module.handler (D:\sem-4 project\CricVerse\.next\dev\server\chunks\[root-of-the-server]__23bb8223._.js:17892:13)
+    at async DevServer.renderToResponseWithComponentsImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1422:9)
+    at async DevServer.renderPageComponent (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1474:24)
+    at async DevServer.renderToResponseImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1524:32)
+    at async DevServer.pipeImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:1018:25)
+    at async NextNodeServer.handleCatchallRenderRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\next-server.js:395:17)
+    at async DevServer.handleRequestImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\base-server.js:909:17)
+    at async D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:387:20
+    at async Span.traceAsyncFn (D:\sem-4 project\CricVerse\node_modules\next\dist\trace\trace.js:157:20)
+    at async DevServer.handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\dev\next-dev-server.js:383:24)
+    at async invokeRender (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:248:21)
+    at async handleRequest (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:447:24)
+    at async requestHandlerImpl (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\router-server.js:496:13)
+    at async Server.requestListener (D:\sem-4 project\CricVerse\node_modules\next\dist\server\lib\start-server.js:226:13)

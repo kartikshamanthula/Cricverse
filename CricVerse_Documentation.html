@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CricVerse - Project Documentation</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            line-height: 1.6; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 40px 20px; 
+            color: #333; 
+        }
+        h1, h2, h3 { color: #2c3e50; }
+        h1.title { text-align: center; font-size: 2.2em; border: none; }
+        h2.subtitle { text-align: center; font-size: 1.5em; border: none; color: #555; }
+        h1, h2 { border-bottom: 2px solid #eaeaea; padding-bottom: 8px; margin-top: 40px; }
+        .text-center { text-align: center; }
+        hr { border: 0; height: 1px; background: #ccc; margin: 40px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 1em; box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); }
+        th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f4f6f8; color: #333; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .page-break { page-break-after: always; }
+        .signature-section { display: flex; justify-content: space-between; margin-top: 80px; }
+        .signature { text-align: center; width: 250px; }
+        .signature-line { border-top: 1px solid #333; margin-top: 50px; padding-top: 10px; }
+        ul, ol { margin-bottom: 20px; }
+        li { margin-bottom: 8px; }
+        .mermaid { margin: 30px 0; text-align: center; background: #fdfdfd; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; }
+        @media print {
+            body { padding: 0; }
+            .page-break { margin-top: 0; border: none; padding-top: 0; }
+            h1, h2, h3 { page-break-after: avoid; }
+            pre, blockquote { page-break-inside: avoid; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body>
+
+    <h1 class="title">BHAGWAN MAHAVIR UNIVERSITY, SURAT</h1>
+    <h2 class="subtitle">BHAGWAN MAHAVIR COLLEGE OF MANAGEMENT</h2>
+    <h3 class="text-center">MASTER OF COMPUTER APPLICATION (M.C.A.)</h3>
+
+    <div style="margin: 80px 0;">
+        <h1 class="title">PROJECT REPORT</h1>
+        <h2 class="subtitle">ON</h2>
+        <h1 class="title">"CricVerse: Comprehensive Cricket Management System"</h1>
+    </div>
+
+    <p class="text-center">Submitted in fulfillment towards the award of the degree of Master of Computer Application.</p>
+    <p class="text-center" style="font-weight: bold;">For the Academic Year 2024-2025</p>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 60px;">
+        <div>
+            <p><strong>Submitted By:</strong></p>
+            <p>Name & Enrollment Number:</p>
+            <p><strong>[Your Name] – [Your Enrollment Number]</strong></p>
+        </div>
+        <div style="text-align: right;">
+            <p><strong>Internal Guide:</strong></p>
+            <p><strong>Prof. [Guide Name]</strong></p>
+        </div>
+    </div>
+
+    <div class="text-center" style="margin-top: 60px;">
+        <p>Bhagwan Mahavir College of Management</p>
+        <p>M.C.A.</p>
+        <p>Surat</p>
+    </div>
+
+    <hr class="page-break">
+
+    <h2>CERTIFICATE</h2>
+    <p>This is to certify that the Project entitled <strong>"CricVerse"</strong> was prepared by:</p>
+    <ul>
+        <li><strong>Enrollment No:</strong> [Your Enrollment Number]</li>
+        <li><strong>Name:</strong> [Your Name]</li>
+    </ul>
+    <p>Under my guidance to fulfill the degree of Master of Computer Application (4th semester) of Bhagwan Mahavir University, Surat during the academic year 2024-25.</p>
+    <p>I certify that this project is their original work and not copied from other sources.</p>
+
+    <div class="signature-section">
+        <div class="signature">
+            <div class="signature-line">Internal Guide Signature</div>
+        </div>
+        <div class="signature">
+            <div class="signature-line">HOD Signature</div>
+        </div>
+    </div>
+    <p style="text-align: center; margin-top: 30px;">The Project is forwarded to the University for Further Evaluation.</p>
+
+    <div style="margin-top: 60px;">
+        <p><strong>The Project is evaluated by:</strong></p>
+        <ol>
+            <li style="margin-bottom: 20px;">Name & Sign of External Examiner: _______________________</li>
+            <li>Name & Sign of External Examiner: _______________________</li>
+        </ol>
+    </div>
+
+    <hr class="page-break">
+
+    <h2>ACKNOWLEDGEMENT</h2>
+    <p>We express our sincere gratitude to Bhagwan Mahavir University, Surat, for providing us with the opportunity to work on this project, <strong>"CricVerse"</strong>. This project has been an enriching learning experience, helping us enhance our technical, analytical, and full-stack development skills.</p>
+    
+    <p>We extend our heartfelt appreciation to our internal guide, <strong>Prof. [Guide Name]</strong>, for their invaluable guidance, continuous support, and constructive feedback throughout the project. Their expertise and encouragement have played a significant role in shaping our work.</p>
+    
+    <p>We are also extremely grateful to our Principal, for providing us with the necessary resources and an excellent learning environment, which has been instrumental in the successful completion of this project.</p>
+    
+    <p>We would also like to thank our faculty members and mentors for their insightful suggestions and motivation, which helped us refine our ideas and implementation. A special thanks to our friends and family for their unwavering support, patience, and encouragement, which kept us motivated during the project development process.</p>
+    
+    <p>Finally, we are grateful for the knowledge and resources available to us, which have been instrumental in completing this project successfully.</p>
+    
+    <div style="margin-top: 40px;">
+        <p><strong>[Your Name]</strong></p>
+        <p>M.C.A.<br>Bhagwan Mahavir College of Management<br>Surat, 2024-2025</p>
+    </div>
+
+    <hr class="page-break">
+
+    <h2>INDEX</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>SR.NO</th>
+                <th>TOPIC</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>1</strong></td><td><strong>Introduction</strong></td></tr>
+            <tr><td>1.1</td><td>Existing System</td></tr>
+            <tr><td>1.2</td><td>Need for the New System</td></tr>
+            <tr><td>1.3</td><td>Objective of the New System</td></tr>
+            <tr><td>1.4</td><td>Problem Definition</td></tr>
+            <tr><td>1.5</td><td>Assumptions and Constraints</td></tr>
+            <tr><td>1.6</td><td>Advantages of the Proposed System</td></tr>
+            <tr><td>1.7</td><td>Limitations of the Proposed System</td></tr>
+            
+            <tr><td><strong>2</strong></td><td><strong>Requirements Gathering & Targeted Users</strong></td></tr>
+            <tr><td>2.1</td><td>Target Users</td></tr>
+            <tr><td>2.2</td><td>Requirements</td></tr>
+
+            <tr><td><strong>3</strong></td><td><strong>System Design</strong></td></tr>
+            <tr><td>3.1</td><td>Use Case Diagram</td></tr>
+            <tr><td>3.2</td><td>ER Diagram</td></tr>
+            <tr><td>3.3</td><td>Flow Chart (User Login) & DFD</td></tr>
+            <tr><td>3.4</td><td>User System & State Diagram</td></tr>
+            <tr><td>3.5</td><td>Class Diagram</td></tr>
+            <tr><td>3.6</td><td>Interaction Diagram</td></tr>
+            <tr><td>3.7</td><td>Activity Diagram</td></tr>
+            <tr><td>3.8</td><td>Data Dictionary</td></tr>
+
+            <tr><td><strong>4</strong></td><td><strong>Development</strong></td></tr>
+            <tr><td>4.1</td><td>Coding Standards</td></tr>
+
+            <tr><td><strong>5</strong></td><td><strong>Agile Documentation</strong></td></tr>
+            <tr><td>5.1</td><td>Agile Project Charter</td></tr>
+            <tr><td>5.2</td><td>Agile Roadmap / Schedule</td></tr>
+            <tr><td>5.3</td><td>Agile Project Plan</td></tr>
+            <tr><td>5.4</td><td>Agile Development Tools</td></tr>
+            <tr><td>5.5</td><td>Risk Management & Contingency Plan</td></tr>
+            <tr><td>5.6</td><td>Agile User Story</td></tr>
+            <tr><td>5.7</td><td>Agile Sprint Backlog (Phase-Based)</td></tr>
+            <tr><td>5.8</td><td>Agile Test Plan</td></tr>
+
+            <tr><td><strong>6</strong></td><td><strong>Earned Value and Burn Charts</strong></td></tr>
+            <tr><td>6.1</td><td>Proposed Enhancements</td></tr>
+
+            <tr><td><strong>7</strong></td><td><strong>Screen Shots of project</strong></td></tr>
+        </tbody>
+    </table>
+
+    <hr class="page-break">
+
+    <h2>1. INTRODUCTION</h2>
+
+    <h3>1.1 EXISTING SYSTEM</h3>
+    <ul>
+        <li>The current systems for managing local cricket tournaments, tracking team rosters, and logging live scores largely involve manual paper-based scoresheets or fragmented, disconnected mobile apps.</li>
+        <li>There is no centralized system that dynamically correlates live scored matches with an overarching tournament standing, player career profiles, and equipment purchases in one ecosystem.</li>
+        <li><strong>Time-Consuming:</strong> Organizers must manually aggregate scores from physical sheets and calculate run-rates/averages at the end of matches.</li>
+        <li><strong>Error-Prone:</strong> Physical calculation of complex metrics like Net Run Rate (NRR) and bowler economy is subject to human error and frequently causes disputes.</li>
+        <li><strong>Decentralized Data:</strong> Player stats, tournament fixtures, and team management are stored on personal devices or spreadsheets, limiting accessibility.</li>
+    </ul>
+
+    <h3>1.2 NEED FOR THE NEW SYSTEM</h3>
+    <p>Local clubs, academies, and professional leagues frequently interact with players, umpires, and fans. They accumulate massive amounts of data from game to game. The manual process of recording scores ball-by-ball, updating points tables, and managing equipment inventory is highly inefficient.</p>
+    <p><strong>Key Drivers for the Need of a New System:</strong></p>
+    <ul>
+        <li>A robust digital solution to replace physical scoresheets and manual accounting.</li>
+        <li>Automated generation of career statistics and tournament standings.</li>
+        <li>Real-time live scoring UI that broadcasts math updates to fans instantly.</li>
+        <li>An integrated e-commerce store allowing players and clubs to safely purchase professional standard gear directly from the management platform.</li>
+    </ul>
+
+    <h3>1.3 OBJECTIVE OF THE NEW SYSTEM</h3>
+    <ul>
+        <li>Develop a secure, high-performance, user-friendly digital cricket management web application using Next.js and MongoDB.</li>
+        <li>Automate complete match orchestration with a seamless ball-by-ball logging system.</li>
+        <li>Provide real-time data persistence, broadcasting scores, wickets, and run rates dynamically.</li>
+        <li>Implement an intuitive team management dashboard to create rosters, assign captaincy, and analyze multi-format player histories.</li>
+        <li>Build an authentic pro-cricket store with shopping cart context APIs and secure order capabilities.</li>
+    </ul>
+
+    <h3>1.4 PROBLEM DEFINITION</h3>
+    <ul>
+        <li><strong>Limited Accessibility:</strong> Physical scoresheets get damaged or lost. Fans cannot track away games.</li>
+        <li><strong>Manual Data Entry:</strong> Tournaments require dedicated statisticians just to enter box scores to spreadsheets post-match.</li>
+        <li><strong>Lack of Integration:</strong> Existing small-scale scoring apps do not link team management with equipment purchasing or global leaderboards.</li>
+    </ul>
+
+    <h3>1.5 ASSUMPTIONS AND CONSTRAINTS</h3>
+    <ul>
+        <li><strong>Assumptions:</strong> Users have access to modern web browsers and an active internet connection for live scoring syncing. Waiters/scorers have basic knowledge of cricket rules.</li>
+        <li><strong>Constraints:</strong> Heavy dependency on network stability during live scoring; offline fallbacks may have limited capacity in initial versions.</li>
+    </ul>
+
+    <h3>1.6 ADVANTAGES OF THE PROPOSED SYSTEM</h3>
+    <ul>
+        <li><strong>Centralized Data Hub:</strong> All teams, matches, tournaments, and purchases reside in a single, secure MongoDB cluster.</li>
+        <li><strong>Real-Time Accuracy:</strong> Programmatic calculations of complex cricket metrics instantly.</li>
+        <li><strong>Digital Ecosystem:</strong> Unites the supply chain of playing the game (scoring/teams) with equipping for the game (apparel/gear).</li>
+        <li><strong>Stunning UI/UX:</strong> Built with Radix UI and Framer Motion, offering dynamic transitions, skeleton loaders, and a highly responsive experience.</li>
+    </ul>
+
+    <h3>1.7 LIMITATIONS OF THE PROPOSED SYSTEM</h3>
+    <ul>
+        <li>Initial version requires active internet architecture – no fully localized offline scoring engine.</li>
+        <li>Integrating external delivery tracking for e-commerce store is handled manually by admin until third-party logistics APIs are plugged in.</li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>2. REQUIREMENTS GATHERING & TARGETED USERS</h2>
+
+    <h3>2.1 TARGET USERS</h3>
+    <ol>
+        <li><strong>Scorers & Umpires:</strong> Require an intuitive interface to immediately record complex game states seamlessly.</li>
+        <li><strong>Team Managers / Captains:</strong> Need a dashboard for drafting players, managing profiles, and tracking historical roster performance.</li>
+        <li><strong>Tournament Admins:</strong> Require God-mode access to schedule fixtures, modify match statuses, and finalize standings.</li>
+        <li><strong>Fans / Customers:</strong> Need read-only access to live matches, and dynamic purchasing access to the Pro Store for ordering gear.</li>
+    </ol>
+
+    <h3>2.2 REQUIREMENTS</h3>
+    <p><strong>Functional Requirements:</strong></p>
+    <ul>
+        <li>The system must provide secure user authentication (Registration, Login, Role assignment).</li>
+        <li>The system must allow users to create and manage teams, including adding players, assigning roles, and uploading team logos.</li>
+        <li>The system must feature a live scoring engine to log runs, extras, wickets, and compute rates per ball.</li>
+        <li>The system must be capable of generating match result summaries and sharing them (e.g., via generated PDF).</li>
+        <li>Users must be able to browse a catalog of merchandise, add items to a cart, view a checkout sheet, and manage their order.</li>
+    </ul>
+
+    <p><strong>Non-Functional Requirements:</strong></p>
+    <ul>
+        <li><strong>Performance:</strong> Live score updates should be persisted with minimal latency.</li>
+        <li><strong>Usability:</strong> The UI must adhere to modern glassmorphic designs, with intuitive micro-interactions and dark/light modes.</li>
+        <li><strong>Scalability:</strong> The NoSQL (MongoDB/Mongoose) schema must be capable of scaling from local tournaments to nationwide leagues.</li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>3. SYSTEM DESIGN</h2>
+
+    <h3>3.1 USE CASE DIAGRAM</h3>
+    <div class="mermaid">
+    graph TB
+        subgraph "CricVerse Platform"
+            UC1[Create Match & Configure Toss]
+            UC2[Score Match Live]
+            UC3[Manage Teams & Players]
+            UC4[Organize Tournaments & Fixtures]
+            UC5[Browse Store & Cart Checkout]
+            UC6[View Leaderboard Profiles]
+            UC7[Platform Administration]
+        end
+        
+        Scorer((Scorer))
+        Manager((Team Manager))
+        Fan((Fan / Customer))
+        Admin((Admin))
+        
+        Scorer --> UC1
+        Scorer --> UC2
+        Manager --> UC3
+        Fan --> UC5
+        Fan --> UC6
+        Admin --> UC4
+        Admin --> UC7
+    </div>
+
+    <h3>3.2 ER DIAGRAM & SCHEMA STRUCTURE</h3>
+    <p><strong>Core Entities and Relationships:</strong></p>
+    <ul>
+        <li><strong>User</strong> (1) creates (N) <strong>Teams</strong>.</li>
+        <li><strong>Team</strong> (1) contains (N) embedded <strong>Players</strong>.</li>
+        <li><strong>Match</strong> references (2) <strong>Teams</strong>.</li>
+        <li><strong>Match</strong> embeds (N) <strong>Innings</strong>, which embeds <strong>Balls</strong>.</li>
+        <li><strong>Tournament</strong> contains (N) <strong>Matches</strong> and (N) <strong>Teams</strong>.</li>
+        <li><strong>Product</strong> (1) is placed in (N) <strong>Orders</strong> by <strong>Users</strong>.</li>
+    </ul>
+
+    <h3>3.3 FLOW CHART (USER LOGIN) & DFD</h3>
+    <div class="mermaid">
+    graph LR
+        User([User Phase]) -- Credentials --> Core[[CricVerse Engine]]
+        Core -- JWT/Session token --> User
+        Core -- Live Data/Products --> FrontEnd([Frontend Views])
+        Core -- Queries --> Database[(MongoDB)]
+    </div>
+
+    <h3>3.4 USER SYSTEM & STATE DIAGRAM</h3>
+    <p><strong>Match State Lifecycle:</strong></p>
+    <div class="mermaid">
+    stateDiagram-v2
+        [*] --> MatchConfigured
+        MatchConfigured --> TossCompleted
+        TossCompleted --> Innings1Live : Select Opening Batsmen/Bowler
+        Innings1Live --> InningsBreak : All Out OR Overs Complete
+        InningsBreak --> Innings2Live : Start Target Chase
+        Innings2Live --> MatchCompleted : Target Reached OR Overs/Wickets Finish
+        MatchCompleted --> [*]
+    </div>
+
+    <h3>3.5 CLASS DIAGRAM</h3>
+    <p>Primary domain models implemented in Mongoose Schema:</p>
+    <ul>
+        <li><strong>Match.js</strong>: Properties: Date, Venue, Toss, Status, Innings (embedded arrays).</li>
+        <li><strong>Team.js</strong>: Properties: Name, Captain, Logo, Players (roles, stats), General Stats.</li>
+        <li><strong>Tournament.js</strong>: Properties: Format, Fixtures, Enrolled Teams.</li>
+        <li><strong>Product.js</strong>: Properties: Name, Price, Stock, Category, Rating.</li>
+    </ul>
+
+    <h3>3.6 INTERACTION DIAGRAM</h3>
+    <p><strong>Live Scoring Event Execution:</strong></p>
+    <ol>
+        <li>Scorer presses "4 Runs".</li>
+        <li>UI local state updates instantly, firing API request `/api/matches/[id]/ball`.</li>
+        <li>Server calculates updated OVS, Runs, Strike rate.</li>
+        <li>Server responds 200 OK. Backend persists to MongoDB.</li>
+    </ol>
+
+    <h3>3.7 ACTIVITY DIAGRAM</h3>
+    <p><strong>E-commerce Checkout Flow:</strong></p>
+    <ol>
+        <li>User interacts with Pro Store.</li>
+        <li>Clicks "Add to Bag".</li>
+        <li>`CartContext` checks existing Array.</li>
+        <li>If exists, increment quantity. If new, push object to payload.</li>
+        <li>User opens Sidebar Cart -> clicks Checkout -> Confirms Order -> DB `Orders` created.</li>
+    </ol>
+
+    <h3>3.8 DATA DICTIONARY</h3>
+    <ul>
+        <li><strong>User Document:</strong> <code>{ _id: ObjectId, email: String, passwordHash: String, role: Enum(user, admin, scorer) }</code></li>
+        <li><strong>Team Document:</strong> <code>{ _id: ObjectId, name: String, players: [{name, role, stats}], stats: Object }</code></li>
+        <li><strong>Match Document:</strong> <code>{ _id: ObjectId, teamA: ObjectId, teamB: ObjectId, innings: [Array of ball/over schemas] }</code></li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>4. DEVELOPMENT</h2>
+
+    <h3>4.1 CODING STANDARDS</h3>
+    <ul>
+        <li><strong>Framework Architecture:</strong> Next.js 16 App Router paradigm with Server and Client Components appropriately isolated (<code>"use client"</code> declarations).</li>
+        <li><strong>Naming Conventions:</strong> CamelCase for functions and variables, PascalCase for React Components (e.g. <code>LandingHero.jsx</code>), Kebab-case for module paths and URLs.</li>
+        <li><strong>Modularity:</strong> Reusable UI components housed in <code>components/ui/</code> (using Radix structural primitives combined with <code>tailwind-merge</code> class overrides).</li>
+        <li><strong>State Segregation:</strong> Global concerns (Theme context, Cart context) wrapped in React Contexts, whereas local ephemeral state uses <code>useState/useReducer</code>.</li>
+        <li><strong>Validation:</strong> Zod schemas applied globally before Mongoose hydration to prevent malicious payloads or bad schema imports.</li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>5. AGILE DOCUMENTATION</h2>
+
+    <h3>5.1 AGILE PROJECT CHARTER</h3>
+    <p><strong>Vision:</strong> Build the ultimate digital ecosystem for managing local and professional cricket natively on the web.</p>
+    <p><strong>Mission:</strong> Transition organizers from manual clipboards to an automated, visually stunning web command center.</p>
+    <p><strong>Success Criteria:</strong> 0ms downtime during score logging, &lt; 500ms API response time, fully functional E-commerce system natively integrated.</p>
+
+    <h3>5.2 AGILE ROADMAP / SCHEDULE</h3>
+    <ul>
+        <li><strong>Phase 1 (Sprint 1-2):</strong> Database schema modeling (MongoDB), Team CRUD architecture, landing page UI.</li>
+        <li><strong>Phase 2 (Sprint 3-5):</strong> Match Engine architecture (Overs, Innings logic). The most math-intensive phase.</li>
+        <li><strong>Phase 3 (Sprint 6-7):</strong> Tournament logic, fixture orchestration, leaderboard integration.</li>
+        <li><strong>Phase 4 (Sprint 8):</strong> E-Commerce Store UI, Cart state configuration.</li>
+        <li><strong>Phase 5 (Sprint 9):</strong> Security (Auth), Testing, Vercel deployments.</li>
+    </ul>
+
+    <h3>5.3 AGILE PROJECT PLAN</h3>
+    <p>Executed using a Scrum framework with weekly sprint cycles, maintaining a strict emphasis on having vertical slices (Frontend integrated with Backend) functional at task completion rather than working strictly horizontally.</p>
+
+    <h3>5.4 AGILE DEVELOPMENT TOOLS</h3>
+    <ul>
+        <li><strong>IDE:</strong> Visual Studio Code</li>
+        <li><strong>Environment:</strong> Node.js v20+ / npm</li>
+        <li><strong>Database GUI:</strong> MongoDB Compass / Atlas Web</li>
+        <li><strong>Version Control:</strong> Git & GitHub</li>
+        <li><strong>API Testing:</strong> Postman / VSCode Thunder Client</li>
+    </ul>
+
+    <h3>5.5 RISK MANAGEMENT & CONTINGENCY PLAN</h3>
+    <ul>
+        <li><strong>Risk:</strong> Internet failure during a Live Match scoring process leading to lost calculations.<br>
+        <strong>Contingency:</strong> Ensure React local state holds the active Over's ball history momentarily and attempts re-synchronization continuously upon reconnect.</li>
+        <li><strong>Risk:</strong> Edge-case cricket rules (e.g., Penalty runs, run out on wide).<br>
+        <strong>Contingency:</strong> Form-based fallback modals for umpires to override algorithmically generated stats manually.</li>
+    </ul>
+
+    <h3>5.6 AGILE USER STORY</h3>
+    <ul>
+        <li><em>As a Team Manager, I want to create a comprehensive player roster and upload my team's logo, so I can establish our professional identity.</em></li>
+        <li><em>As a Scorer, I want to log a Wicket and simultaneously assign the new Batsman in one unified popup window, so the game is not needlessly delayed.</em></li>
+        <li><em>As a Fan, I want to buy an English Willow cricket bat from the integrated store without needing to authenticate into a different website.</em></li>
+    </ul>
+
+    <h3>5.7 AGILE SPRINT BACKLOG (Phase-Based)</h3>
+    <ol>
+        <li>Initialize Next.js project with Tailwind v4 & Shadcn/Radix configs.</li>
+        <li>Formulate Mongoose schemas (<code>models/*.js</code>).</li>
+        <li>Build Store UI and Product Gallery.</li>
+        <li>Establish complex <code>CartContext.jsx</code> for global cart handling.</li>
+        <li>Create Live Scoring Keyboard-Shortcut logic.</li>
+    </ol>
+
+    <h3>5.8 AGILE TEST PLAN</h3>
+    <ul>
+        <li><strong>Unit Testing:</strong> Validate Javascript calculation utility functions (Economy, NRR, Strike Rate) independently.</li>
+        <li><strong>Integration Testing:</strong> Test API route logic (<code>/api/teams</code>, <code>/api/matches</code>) ensuring duplicates throw <code>E11000</code> handled gracefully in the UI.</li>
+        <li><strong>UI/UX Testing:</strong> Viewport resizing on mobile devices to ensure Live Scorecards remain visible.</li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>6. EARNED VALUE AND BURN CHARTS</h2>
+    <p><em>(In a real visual report, burn-down charts visually depicting estimated hours vs actual hours consumed per sprint would be placed here.)</em></p>
+
+    <h3>6.1 PROPOSED ENHANCEMENTS</h3>
+    <ul>
+        <li><strong>Analytics:</strong> Integration of deep-learning generated wagon wheels identifying player pitch map weaknesses.</li>
+        <li><strong>Delivery Integration:</strong> Adding live tracking capabilities via 3rd party logistic APIs for equipment purchased in the Pro Store.</li>
+        <li><strong>Monetization:</strong> Integrating payment gateways (Stripe/Razorpay) securely into the Cart architecture.</li>
+    </ul>
+
+    <hr class="page-break">
+
+    <h2>7. SCREEN SHOTS OF PROJECT</h2>
+    <p><em>(Replace these placeholders with actual images of your CricVerse application before submission)</em></p>
+
+    <ol>
+        <li><strong>Figure 1:</strong> Landing Page (Dark Mode) showcasing Framer Motion animations and parallax background glows.</li>
+        <li><strong>Figure 2:</strong> Pro Store grid displaying items, categories, and shopping cart sidebar.</li>
+        <li><strong>Figure 3:</strong> Live Scoring Interface with ball-by-ball ticker and current run-rate indicators.</li>
+        <li><strong>Figure 4:</strong> Team Manager Roster showing player profiles and roles.</li>
+        <li><strong>Figure 5:</strong> Generated Match PDF scorecard export.</li>
+    </ol>
+
+    <div style="text-align: center; margin-top: 100px; color: #888;">
+        <strong>[ END OF REPORT ]</strong>
+    </div>
+
+</body>
+</html>

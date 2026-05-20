@@ -1,26 +1,388 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.5rem;
+
+  /* Light Theme - Professional and Clean */
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.15 0.01 240);
+
+  /* Cards - Slightly darker white */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 240);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 240);
+
+  /* Primary - Vibrant Emerald Green */
+  --primary: oklch(0.55 0.22 150);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Secondary - Vibrant Blue*/
+  --secondary: oklch(0.5 0.18 250);
+  --secondary-foreground: oklch(0.98 0 0);
+
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.45 0.01 240);
+
+  --accent: oklch(0.94 0.01 240);
+  --accent-foreground: oklch(0.15 0.01 240);
+
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.88 0.01 240);
+  --input: oklch(0.88 0.01 240);
+  --ring: oklch(0.55 0.22 150);
+
+  --chart-1: oklch(0.55 0.22 150);
+  --chart-2: oklch(0.5 0.18 250);
+  --chart-3: oklch(0.6 0.18 40);
+  --chart-4: oklch(0.7 0.13 80);
+  --chart-5: oklch(0.7 0.13 300);
+
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.15 0.01 240);
+  --sidebar-primary: oklch(0.55 0.22 150);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.94 0.01 240);
+  --sidebar-accent-foreground: oklch(0.15 0.01 240);
+  --sidebar-border: oklch(0.88 0.01 240);
+  --sidebar-ring: oklch(0.55 0.22 150);
+}
+
+.dark {
+  /* Deep Dark Background (Rich Black) */
+  --background: oklch(0.12 0.01 240);
+  --foreground: oklch(0.98 0 0);
+
+  /* Cards - Slightly lighter */
+  --card: oklch(0.17 0.01 240);
+  --card-foreground: oklch(0.98 0 0);
+
+  --popover: oklch(0.17 0.01 240);
+  --popover-foreground: oklch(0.98 0 0);
+
+  /* Primary - Vibrant Emerald Green */
+  --primary: oklch(0.65 0.25 150);
+  --primary-foreground: oklch(0.12 0.01 240);
+
+  /* Secondary - Vibrant Blue*/
+  --secondary: oklch(0.6 0.2 250);
+  --secondary-foreground: oklch(0.98 0 0);
+
+  --muted: oklch(0.25 0.01 240);
+  --muted-foreground: oklch(0.7 0 0);
+
+  --accent: oklch(0.25 0.01 240);
+  --accent-foreground: oklch(0.98 0 0);
+
+  --destructive: oklch(0.6 0.25 25);
+  --border: oklch(0.25 0.01 240);
+  --input: oklch(0.25 0.01 240);
+  --ring: oklch(0.65 0.25 150);
+
+  --chart-1: oklch(0.65 0.25 150);
+  --chart-2: oklch(0.6 0.2 250);
+  --chart-3: oklch(0.7 0.2 40);
+  --chart-4: oklch(0.8 0.15 80);
+  --chart-5: oklch(0.8 0.15 300);
+
+  --sidebar: oklch(0.12 0.01 240);
+  --sidebar-foreground: oklch(0.98 0 0);
+  --sidebar-primary: oklch(0.65 0.25 150);
+  --sidebar-primary-foreground: oklch(0.12 0.01 240);
+  --sidebar-accent: oklch(0.17 0.01 240);
+  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-border: oklch(0.25 0.01 240);
+  --sidebar-ring: oklch(0.65 0.25 150);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Coin Flip Animations - Moved from page.js to avoid hydration issues */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+@keyframes coin-toss {
+  0% {
+    transform: rotateY(0deg) translateY(0);
+  }
+
+  50% {
+    transform: rotateY(900deg) translateY(-150px) scale(1.1);
+  }
+
+  100% {
+    transform: rotateY(1800deg) translateY(0);
+  }
+}
+
+@keyframes shadow-shrink {
+  0% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+
+  50% {
+    transform: scale(0.5);
+    opacity: 0.1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.2;
+  }
+}
+
+.animate-coin-toss {
+  animation: coin-toss 3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-shadow-shrink {
+  animation: shadow-shrink 3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide scrollbar for select elements */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* =========================================================
+    PRINT / PDF STYLES  — hidden on screen, active on print
+========================================================= */
+
+/* ── Hide screen-only elements in print ── */
+@media print {
+    /* Global nav & header */
+    header               { display: none !important; }
+    nav                  { display: none !important; }
+    [data-sonner-toaster]{ display: none !important; }
+
+    /* Hide the screen page content — show only print-only doc */
+    .screen-only         { display: none !important; }
+    .no-print            { display: none !important; }
+
+    /* Force white canvas */
+    *, *::before, *::after { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html, body { background: #ffffff !important; color: #111827 !important;
+                 font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 12px; }
+
+    /* Page geometry — margin:0 removes browser URL/date header+footer */
+    @page { size: A4 portrait; margin: 0; }
+
+    /* Unwrap Next.js layout divs */
+    .min-h-screen { min-height: unset !important; }
+    .max-w-6xl    { max-width: 100% !important; padding: 0 !important; }
+}
+
+/* ── CricVerse branded top bar ── */
+.print-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    border-bottom: 2.5px solid #16a34a;
+}
+.print-header-logo   { display: flex !important; align-items: center; gap: 8px; }
+.print-header-badge  {
+    width: 36px; height: 36px;
+    background: #16a34a;
+    border-radius: 8px;
+    display: flex !important;
+    align-items: center; justify-content: center;
+}
+.print-header-badge svg { width: 20px; height: 20px; }
+.print-header-wordmark      { font-size: 20px; font-weight: 900; color: #111827; letter-spacing: -0.4px; }
+.print-header-wordmark span { color: #16a34a; }
+.print-header-tag  { font-size: 9px; color: #6b7280; margin-top: 1px; letter-spacing: .4px; text-transform: uppercase; }
+.print-header-meta { text-align: right; }
+.print-header-meta p { margin: 0; font-size: 9.5px; color: #6b7280; line-height: 1.5; }
+.print-header-meta strong { color: #374151; }
+
+/* ── Result banner ── */
+.print-result-banner {
+    background: #f0fdf4 !important;
+    border: 1.5px solid #86efac;
+    border-radius: 10px;
+    padding: 12px 20px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.print-result-banner h2 { margin: 0 0 4px; font-size: 17px; color: #111827; }
+.print-result-banner p  { margin: 0; font-size: 14px; font-weight: 700; color: #16a34a; }
+
+/* ── Match info grid ── */
+.print-info-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+.print-info-cell {
+    display: block !important;
+    padding: 10px 14px;
+    border-right: 1px solid #e5e7eb;
+}
+.print-info-cell:last-child { border-right: none; }
+.print-info-label { font-size: 9px; text-transform: uppercase; letter-spacing: .6px; color: #6b7280; margin-bottom: 3px; }
+.print-info-value { font-size: 13px; font-weight: 700; color: #111827; }
+
+/* ── Innings block ── */
+.print-innings-wrapper {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.print-innings-block {
+    display: block !important;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.print-innings-header {
+    background: #f9fafb;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.print-innings-header h3 { margin: 0; font-size: 13px; font-weight: 800; color: #111827; }
+.print-innings-header .score { font-size: 18px; font-weight: 900; color: #111827; }
+.print-innings-header .rr   { font-size: 10px; color: #6b7280; }
+.print-innings-section-title {
+    padding: 6px 14px 2px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    font-weight: 700;
+    color: #6b7280;
+    background: #fafafa;
+    border-bottom: 1px solid #f3f4f6;
+}
+.print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+.print-table th {
+    padding: 5px 10px;
+    background: #f3f4f6;
+    text-align: left;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: #6b7280;
+    font-weight: 600;
+}
+.print-table td {
+    padding: 5px 10px;
+    border-top: 1px solid #f3f4f6;
+    color: #111827;
+}
+.print-table .right { text-align: right; font-variant-numeric: tabular-nums; }
+.print-table .bold  { font-weight: 700; }
+
+/* ── Teams card ── */
+.print-teams-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+.print-team-card {
+    display: block !important;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 16px;
+}
+.print-team-card h4 { margin: 0 0 4px; font-size: 13px; font-weight: 800; }
+.print-team-card p  { margin: 0; font-size: 10px; color: #6b7280; }
+
+/* ── Footer ── */
+.print-footer {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    margin-top: 16px;
+    font-size: 9px;
+    color: #9ca3af;
+}
+
+/* ── Hide print-only elements on screen ── */
+@media screen {
+    .print-only { display: none !important; }
 }
