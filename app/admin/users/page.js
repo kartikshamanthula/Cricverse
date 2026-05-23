@@ -32,7 +32,19 @@ export default function AdminUsersPage() {
     // Dialog state
     const [dialogOpen, setDialogOpen] = useState(false)
     const [editUser, setEditUser] = useState(null)
-    const [form, setForm] = useState({ name: '', username: '', role: 'user' })
+    const [form, setForm] = useState({
+        name: '',
+        username: '',
+        role: 'user',
+        permissions: {
+            liveScoreInternational: true,
+            liveScoreLocal: true,
+            teamModule: true,
+            matchModule: true,
+            tournamentModule: true,
+            storeModule: true
+        }
+    })
     const [saving, setSaving] = useState(false)
 
     // Delete confirm
@@ -64,7 +76,19 @@ export default function AdminUsersPage() {
 
     const openEdit = (u) => {
         setEditUser(u)
-        setForm({ name: u.name, username: u.username, role: u.role })
+        setForm({
+            name: u.name,
+            username: u.username,
+            role: u.role,
+            permissions: u.permissions ?? {
+                liveScoreInternational: true,
+                liveScoreLocal: true,
+                teamModule: true,
+                matchModule: true,
+                tournamentModule: true,
+                storeModule: true
+            }
+        })
         setDialogOpen(true)
     }
 
@@ -292,6 +316,56 @@ export default function AdminUsersPage() {
                                 <option value="user">User</option>
                                 <option value="admin">Admin</option>
                             </select>
+                        </div>
+                        
+                        {/* Custom Dynamic Permissions Section */}
+                        <div className="space-y-3 border-t border-border/60 pt-4">
+                            <div>
+                                <h3 className="text-sm font-bold text-foreground">Module Permissions</h3>
+                                <p className="text-[11px] text-muted-foreground">Manage which features are visible and accessible to this user.</p>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-1">
+                                {[
+                                    { key: 'liveScoreInternational', label: 'Live Score International', desc: 'Allow viewing international scores' },
+                                    { key: 'liveScoreLocal', label: 'Live Score Local Matches', desc: 'Allow viewing local matches' },
+                                    { key: 'teamModule', label: 'Team Module', desc: 'Access /teams pages' },
+                                    { key: 'matchModule', label: 'Match Module', desc: 'Access /matches pages' },
+                                    { key: 'tournamentModule', label: 'Tournament Module', desc: 'Access /tournaments pages' },
+                                    { key: 'storeModule', label: 'Store Module', desc: 'Access /store pages' },
+                                ].map((item) => {
+                                    const checked = form.permissions?.[item.key] ?? true;
+                                    return (
+                                        <div
+                                            key={item.key}
+                                            onClick={() => {
+                                                setForm({
+                                                    ...form,
+                                                    permissions: {
+                                                        ...(form.permissions ?? {}),
+                                                        [item.key]: !checked
+                                                    }
+                                                });
+                                            }}
+                                            className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-start gap-2.5 select-none hover:bg-muted/30 ${
+                                                checked
+                                                    ? 'border-primary/50 bg-primary/5 shadow-xs shadow-primary/5'
+                                                    : 'border-border bg-card'
+                                            }`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                readOnly
+                                                className="mt-0.5 h-3.5 w-3.5 rounded-sm border-input text-primary focus:ring-primary/20 cursor-pointer"
+                                            />
+                                            <div className="flex flex-col leading-none">
+                                                <span className={`text-[12px] font-bold ${checked ? 'text-foreground' : 'text-muted-foreground'}`}>{item.label}</span>
+                                                <span className="text-[10px] text-muted-foreground mt-0.5">{item.desc}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

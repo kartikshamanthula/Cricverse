@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Users, Trophy, ShoppingBag, Award, Calendar } from "lucide-react"
+import { useAuth } from "@/contexts/AuthContext"
 import { cn } from "@/lib/utils"
 
 const navigationItems = [
@@ -36,11 +37,40 @@ const navigationItems = [
 
 export function MobileFooterNav() {
     const pathname = usePathname()
+    const { user } = useAuth()
+
+    const p = user?.role === 'admin' ? {
+        teamModule: true,
+        matchModule: true,
+        tournamentModule: true,
+        storeModule: true
+    } : (user?.permissions ?? {
+        teamModule: true,
+        matchModule: true,
+        tournamentModule: true,
+        storeModule: true
+    });
+
+    const allowedItems = navigationItems.filter(item => {
+        if (item.href === "/teams" && p.teamModule === false) return false;
+        if (item.href === "/tournaments" && p.tournamentModule === false) return false;
+        if (item.href === "/matches" && p.matchModule === false) return false;
+        if (item.href === "/store" && p.storeModule === false) return false;
+        return true;
+    });
+
+    if (allowedItems.length === 0) return null;
 
     return (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border shadow-lg">
-            <div className="grid grid-cols-5 h-16">
-                {navigationItems.map((item) => {
+            <div className={cn("grid h-16", 
+                allowedItems.length === 5 && "grid-cols-5",
+                allowedItems.length === 4 && "grid-cols-4",
+                allowedItems.length === 3 && "grid-cols-3",
+                allowedItems.length === 2 && "grid-cols-2",
+                allowedItems.length === 1 && "grid-cols-1"
+            )}>
+                {allowedItems.map((item) => {
                     const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
                     const Icon = item.icon
                     const isStore = item.special
