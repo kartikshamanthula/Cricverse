@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Calendar, RefreshCw, Swords, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -556,6 +557,7 @@ function SkeletonCard() {
 // ─── Main Widget ──────────────────────────────────────────────────────────────
 
 export function LiveScoreWidget() {
+    const { user } = useAuth();
     const [data, setData] = useState({ live: [], played: [], upcoming: [] });
     const [myMatches, setMyMatches] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -568,6 +570,27 @@ export function LiveScoreWidget() {
     const [refreshing, setRefreshing] = useState(false);
     // Guard browser-only renders to avoid SSR/client hydration mismatch
     const [mounted, setMounted] = useState(false);
+
+    // Resolve dynamic permissions with admin bypass
+    const p = user?.role === 'admin' ? {
+        liveScoreInternational: true,
+        liveScoreLocal: true
+    } : (user?.permissions ?? {
+        liveScoreInternational: true,
+        liveScoreLocal: true
+    });
+
+    const hasInternational = p.liveScoreInternational !== false;
+    const hasLocal = p.liveScoreLocal !== false;
+
+    // Automatically fall back category to whatever is permitted
+    useEffect(() => {
+        if (!hasInternational && hasLocal) {
+            setCategory('local');
+        } else if (hasInternational) {
+            setCategory('international');
+        }
+    }, [hasInternational, hasLocal]);
     // Fetch local matches (mine + everyone else's live matches)
     const fetchMyMatches = useCallback(async () => {
         try {
@@ -640,6 +663,10 @@ export function LiveScoreWidget() {
         ? mySubMatches
         : applyFilter(data[statusTab] ?? [], activeFilter);
 
+    if (!hasInternational && !hasLocal) {
+        return null; // Hide the widget entirely if both match modules are restricted
+    }
+
     return (
         <section className="space-y-5">
             {/* ── Level 1: Header & Category Toggle ── */}
@@ -668,29 +695,31 @@ export function LiveScoreWidget() {
                 </div>
 
                 {/* Main Category Tabs */}
-                <div className="flex bg-muted/40 p-1.5 rounded-xl border border-border/50 self-start md:self-auto shadow-sm">
-                    <button
-                        onClick={() => setCategory('international')}
-                        className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm transition-all duration-300 ${category === 'international'
-                                ? 'bg-background text-foreground font-bold shadow opacity-100'
-                                : 'text-muted-foreground font-semibold hover:text-foreground opacity-70'
-                            }`}
-                    >
-                        International
-                    </button>
-                    <button
-                        onClick={() => setCategory('local')}
-                        className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm transition-all duration-300 ${category === 'local'
-                                ? 'bg-background text-foreground font-bold shadow opacity-100'
-                                : 'text-muted-foreground font-semibold hover:text-foreground opacity-70'
-                            }`}
-                    >
-                        Local Matches
-                        {myCounts.live > 0 && category !== 'local' && (
-                            <span className="flex h-2 w-2 rounded-full bg-green-500 shrink-0" />
-                        )}
-                    </button>
-                </div>
+                {hasInternational && hasLocal && (
+                    <div className="flex bg-muted/40 p-1.5 rounded-xl border border-border/50 self-start md:self-auto shadow-sm">
+                        <button
+                            onClick={() => setCategory('international')}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm transition-all duration-300 ${category === 'international'
+                                    ? 'bg-background text-foreground font-bold shadow opacity-100'
+                                    : 'text-muted-foreground font-semibold hover:text-foreground opacity-70'
+                                }`}
+                        >
+                            International
+                        </button>
+                        <button
+                            onClick={() => setCategory('local')}
+                            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm transition-all duration-300 ${category === 'local'
+                                    ? 'bg-background text-foreground font-bold shadow opacity-100'
+                                    : 'text-muted-foreground font-semibold hover:text-foreground opacity-70'
+                                }`}
+                        >
+                            Local Matches
+                            {myCounts.live > 0 && category !== 'local' && (
+                                <span className="flex h-2 w-2 rounded-full bg-green-500 shrink-0" />
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 {/* Refresh and Time (Desktop) */}
                 <div className="hidden md:flex items-center gap-3 shrink-0">

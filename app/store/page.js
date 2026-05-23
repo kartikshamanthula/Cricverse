@@ -7,7 +7,7 @@ import { useCart } from "@/contexts/CartContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, ShoppingBag, Star, Loader2, Filter, ChevronLeft, ClipboardList } from "lucide-react"
+import { Search, ShoppingBag, Star, Loader2, Filter, ChevronLeft, ClipboardList, MessageCircle, X, Send, Bot, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -18,6 +18,15 @@ export default function StorePage() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const { addToCart, getCartCount, toggleCart, setIsCheckoutOpen } = useCart()
+
+    // AI Chatbot States
+    const [chatOpen, setChatOpen] = useState(false)
+    const [chatMessages, setChatMessages] = useState([])
+    const [chatInput, setChatInput] = useState('')
+    const [chatLoading, setChatLoading] = useState(false)
+    const [chatStyle, setChatStyle] = useState('')
+    const [chatHeight, setChatHeight] = useState('')
+    const [chatBudget, setChatBudget] = useState('')
 
     useEffect(() => {
         setMounted(true)
@@ -54,6 +63,38 @@ export default function StorePage() {
         e.stopPropagation()
         addToCart(product)
         setIsCheckoutOpen(true)
+    }
+
+    const sendChatMessage = async () => {
+        if (!chatInput.trim()) return
+        const userMsg = { role: 'user', content: chatInput.trim() }
+        setChatMessages(prev => [...prev, userMsg])
+        setChatInput('')
+        setChatLoading(true)
+        try {
+            const res = await fetch('/api/ai/shop-consultant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: userMsg.content,
+                    style: chatStyle,
+                    height: chatHeight,
+                    budget: chatBudget,
+                    chatHistory: chatMessages.slice(-8),
+                }),
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'AI failed')
+            setChatMessages(prev => [...prev, {
+                role: 'assistant',
+                content: data.response,
+                products: data.recommendedProducts || [],
+            }])
+        } catch (err) {
+            setChatMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again!' }])
+        } finally {
+            setChatLoading(false)
+        }
     }
 
     return (
@@ -296,6 +337,164 @@ export default function StorePage() {
                     </div>
                 </div>
             </main>
+
+            {/* AI Chat Floating Orb */}
+            <button
+                onClick={() => setChatOpen(!chatOpen)}
+                className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/40 flex items-center justify-center hover:scale-110 transition-all duration-300 group"
+            >
+                {chatOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-green-400 border-2 border-background animate-pulse" />
+            </button>
+
+            {/* AI Chat Drawer */}
+            <AnimatePresence>
+                {chatOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, x: 400 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 400 }}
+                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        className="fixed bottom-24 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] h-[560px] max-h-[calc(100vh-8rem)] bg-background/95 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl flex flex-col overflow-hidden"
+                    >
+                        {/* Chat Header */}
+                        <div className="p-4 border-b border-border/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                                    <Sparkles className="h-5 w-5 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-sm">CricVerse AI Assistant</h3>
+                                    <p className="text-[10px] text-muted-foreground">Your personal cricket gear consultant</p>
+                                </div>
+                            </div>
+                            {/* Quick Profile Inputs */}
+                            <div className="flex gap-1.5 mt-3">
+                                <select value={chatStyle} onChange={(e) => setChatStyle(e.target.value)} className="flex-1 text-[10px] px-2 py-1 rounded-md bg-muted/50 border border-border/50 text-foreground">
+                                    <option value="">Style</option>
+                                    <option value="Aggressive Batsman">Aggressive Bat</option>
+                                    <option value="Defensive Batsman">Defensive Bat</option>
+                                    <option value="Fast Bowler">Fast Bowler</option>
+                                    <option value="Spin Bowler">Spin Bowler</option>
+                                    <option value="Wicketkeeper">Wicketkeeper</option>
+                                    <option value="All-rounder">All-rounder</option>
+                                </select>
+                                <input
+                                    value={chatHeight}
+                                    onChange={(e) => setChatHeight(e.target.value)}
+                                    placeholder="Height"
+                                    className="w-16 text-[10px] px-2 py-1 rounded-md bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground"
+                                />
+                                <input
+                                    value={chatBudget}
+                                    onChange={(e) => setChatBudget(e.target.value)}
+                                    placeholder="Budget ₹"
+                                    className="w-20 text-[10px] px-2 py-1 rounded-md bg-muted/50 border border-border/50 text-foreground placeholder:text-muted-foreground"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Chat Messages */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                            {chatMessages.length === 0 && (
+                                <div className="text-center py-8">
+                                    <Bot className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
+                                    <p className="text-sm font-medium text-muted-foreground">Hi! I'm your AI cricket gear consultant.</p>
+                                    <p className="text-xs text-muted-foreground/60 mt-1">Ask me about bats, balls, gear, or anything cricket!</p>
+                                    <div className="flex flex-wrap gap-1.5 justify-center mt-4">
+                                        {['Best bat for beginners?', 'Recommend gloves', 'What gear do I need?'].map((q) => (
+                                            <button
+                                                key={q}
+                                                onClick={() => { setChatInput(q); }}
+                                                className="text-[10px] px-2.5 py-1 rounded-full border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 transition-colors"
+                                            >
+                                                {q}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {chatMessages.map((msg, idx) => (
+                                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm ${msg.role === 'user'
+                                        ? 'bg-primary text-primary-foreground rounded-br-md'
+                                        : 'bg-muted/50 text-foreground rounded-bl-md border border-border/30'
+                                    }`}>
+                                        <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                        {/* Recommended Product Cards */}
+                                        {msg.products && msg.products.length > 0 && (
+                                            <div className="mt-3 space-y-2">
+                                                {msg.products.map((p) => (
+                                                    <div key={p._id} className="bg-background/80 rounded-xl p-3 border border-border/50 flex items-center gap-3">
+                                                        <div className="h-12 w-12 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden">
+                                                            {p.image ? (
+                                                                <img src={p.image} alt={p.name} className="h-full w-full object-contain" />
+                                                            ) : (
+                                                                <ShoppingBag className="h-5 w-5 text-muted-foreground/40" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-semibold text-xs truncate">{p.name}</p>
+                                                            <div className="flex items-center gap-2 mt-0.5">
+                                                                <span className="font-bold text-xs text-primary">₹{p.price}</span>
+                                                                <span className="text-[9px] text-yellow-500 flex items-center gap-0.5">
+                                                                    <Star className="h-2.5 w-2.5 fill-yellow-500" />{p.rating}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => {
+                                                                addToCart(p)
+                                                                toast.success(`${p.name} added to cart!`)
+                                                            }}
+                                                            className="text-[9px] font-bold px-2 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+                                                        >
+                                                            + Cart
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                            {chatLoading && (
+                                <div className="flex justify-start">
+                                    <div className="bg-muted/50 rounded-2xl rounded-bl-md px-4 py-3 border border-border/30">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                            Thinking...
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Chat Input */}
+                        <div className="p-3 border-t border-border/30 bg-background/50">
+                            <form
+                                onSubmit={(e) => { e.preventDefault(); sendChatMessage(); }}
+                                className="flex gap-2"
+                            >
+                                <input
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                    placeholder="Ask about cricket gear..."
+                                    className="flex-1 text-sm px-4 py-2.5 rounded-xl bg-muted/30 border border-border/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground/60 transition-all"
+                                    disabled={chatLoading}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={chatLoading || !chatInput.trim()}
+                                    className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shrink-0 hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 shadow-lg shadow-purple-500/25"
+                                >
+                                    <Send className="h-4 w-4" />
+                                </button>
+                            </form>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </div>
     )

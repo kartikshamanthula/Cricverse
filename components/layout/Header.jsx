@@ -92,30 +92,38 @@ export function Header() {
                                         <span>Home</span>
                                     </Button>
                                 </Link>
-                                <Link href="/teams">
-                                    <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
-                                        <Users className="h-4 w-4" />
-                                        <span>Teams</span>
-                                    </Button>
-                                </Link>
-                                <Link href="/tournaments">
-                                    <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
-                                        <Trophy className="h-4 w-4" />
-                                        <span>Tournaments</span>
-                                    </Button>
-                                </Link>
-                                <Link href="/matches">
-                                    <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
-                                        <PenTool className="h-4 w-4" />
-                                        <span>Matches</span>
-                                    </Button>
-                                </Link>
-                                <Link href="/store">
-                                    <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
-                                        <ShoppingBag className="h-4 w-4" />
-                                        <span>Store</span>
-                                    </Button>
-                                </Link>
+                                {(user?.role === 'admin' || user?.permissions?.teamModule !== false) && (
+                                    <Link href="/teams">
+                                        <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
+                                            <Users className="h-4 w-4" />
+                                            <span>Teams</span>
+                                        </Button>
+                                    </Link>
+                                )}
+                                {(user?.role === 'admin' || user?.permissions?.tournamentModule !== false) && (
+                                    <Link href="/tournaments">
+                                        <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
+                                            <Trophy className="h-4 w-4" />
+                                            <span>Tournaments</span>
+                                        </Button>
+                                    </Link>
+                                )}
+                                {(user?.role === 'admin' || user?.permissions?.matchModule !== false) && (
+                                    <Link href="/matches">
+                                        <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
+                                            <PenTool className="h-4 w-4" />
+                                            <span>Matches</span>
+                                        </Button>
+                                    </Link>
+                                )}
+                                {(user?.role === 'admin' || user?.permissions?.storeModule !== false) && (
+                                    <Link href="/store">
+                                        <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
+                                            <ShoppingBag className="h-4 w-4" />
+                                            <span>Store</span>
+                                        </Button>
+                                    </Link>
+                                )}
                             </>
                         ) : (
                             <>

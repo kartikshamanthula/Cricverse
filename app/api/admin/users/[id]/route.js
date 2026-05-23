@@ -8,7 +8,7 @@ export async function PATCH(request, { params }) {
         const body = await request.json()
         await connectDB()
 
-        const user = await User.findByIdAndUpdate(id, body, { new: true, runValidators: true }).select("-password")
+        const user = await User.findByIdAndUpdate(id, body, { returnDocument: 'after', runValidators: true }).select("-password")
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }

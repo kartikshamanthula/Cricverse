@@ -10,9 +10,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trophy, Calendar, MapPin, Plus, Users as UsersIcon, X, Trash2 } from 'lucide-react';
+import { Trophy, Calendar, MapPin, Plus, Users as UsersIcon, X, Trash2, Sparkles, Loader2, Mic } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function TournamentDetailsPage() {
     const router = useRouter();
@@ -46,6 +47,13 @@ export default function TournamentDetailsPage() {
     const [showWinnerDialog, setShowWinnerDialog] = useState(false);
     const [selectedWinner, setSelectedWinner] = useState('');
     const [isSettingWinner, setIsSettingWinner] = useState(false);
+
+    // AI Newsroom States
+    const [newsroomMatchId, setNewsroomMatchId] = useState('');
+    const [newsroomRecap, setNewsroomRecap] = useState('');
+    const [newsroomLoading, setNewsroomLoading] = useState(false);
+    const [tournamentReport, setTournamentReport] = useState('');
+    const [reportLoading, setReportLoading] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -474,6 +482,12 @@ export default function TournamentDetailsPage() {
                         className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
                     >
                         Teams ({teamsCount})
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="newsroom"
+                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-3"
+                    >
+                        🎙️ AI Newsroom
                     </TabsTrigger>
                 </TabsList>
 
@@ -1147,6 +1161,176 @@ export default function TournamentDetailsPage() {
                             </Card>
                         )}
                     </div>
+                </TabsContent>
+
+                {/* AI Newsroom Tab */}
+                <TabsContent value="newsroom" className="mt-6 space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                            <Sparkles className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-black tracking-tight">AI Newsroom</h2>
+                            <p className="text-xs text-muted-foreground font-medium">AI-generated match recaps & tournament reports powered by Gemini</p>
+                        </div>
+                    </div>
+
+                    {/* Match Recap Generator */}
+                    <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-pink-500/5 overflow-hidden relative">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
+                        <CardContent className="p-6 space-y-4">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                <Mic className="h-5 w-5 text-purple-500" />
+                                Match Press Desk
+                            </h3>
+                            <p className="text-sm text-muted-foreground">Select a completed match to generate a professional sports recap article.</p>
+                            <div className="flex gap-3 flex-col sm:flex-row">
+                                <Select value={newsroomMatchId} onValueChange={(v) => { setNewsroomMatchId(v); setNewsroomRecap(''); }}>
+                                    <SelectTrigger className="flex-1">
+                                        <SelectValue placeholder="Select a match" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {tournament.fixtures?.filter(f => f.matchId).map((fixture, idx) => {
+                                            const matchData = typeof fixture.matchId === 'object' ? fixture.matchId : null;
+                                            const mId = matchData?._id || fixture.matchId;
+                                            const teamAMatch = tournament.participatingTeams?.find(pt => (pt.teamId?._id || pt.teamId)?.toString() === fixture.teamA?.toString());
+                                            const teamBMatch = tournament.participatingTeams?.find(pt => (pt.teamId?._id || pt.teamId)?.toString() === fixture.teamB?.toString());
+                                            const label = `${fixture.matchNumber || `Match ${idx + 1}`}: ${teamAMatch?.teamId?.name || 'Team A'} vs ${teamBMatch?.teamId?.name || 'Team B'}`;
+                                            return (
+                                                <SelectItem key={mId} value={String(mId)}>{label}</SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    disabled={!newsroomMatchId || newsroomLoading}
+                                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg"
+                                    onClick={async () => {
+                                        setNewsroomLoading(true);
+                                        setNewsroomRecap('');
+                                        try {
+                                            const res = await fetch('/api/ai/recap-match', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ matchId: newsroomMatchId }),
+                                            });
+                                            const data = await res.json();
+                                            if (!res.ok) throw new Error(data.error || 'Failed to generate recap');
+                                            setNewsroomRecap(data.recap);
+                                        } catch (err) {
+                                            toast.error(err.message || 'Failed to generate recap');
+                                        } finally {
+                                            setNewsroomLoading(false);
+                                        }
+                                    }}
+                                >
+                                    {newsroomLoading ? (
+                                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Drafting...</>
+                                    ) : (
+                                        <><Sparkles className="h-4 w-4 mr-2" /> Draft Recap</>
+                                    )}
+                                </Button>
+                            </div>
+
+                            {newsroomRecap && (
+                                <ScrollArea className="max-h-[400px]">
+                                    <div className="bg-background/80 backdrop-blur-sm rounded-xl p-5 border border-purple-500/10 prose prose-sm dark:prose-invert max-w-none">
+                                        <div className="text-[10px] uppercase tracking-widest text-purple-500 font-bold mb-3">AI-Generated Match Report</div>
+                                        <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{newsroomRecap}</div>
+                                    </div>
+                                </ScrollArea>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Tournament Standing Report */}
+                    <Card className="border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-teal-500/5 overflow-hidden relative">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-500" />
+                        <CardContent className="p-6 space-y-4">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                                <Trophy className="h-5 w-5 text-cyan-500" />
+                                Tournament Progress Report
+                            </h3>
+                            <p className="text-sm text-muted-foreground">Generate a comprehensive AI analysis of the current tournament standings, team form, and playoff predictions.</p>
+                            <Button
+                                disabled={reportLoading || teamsCount === 0}
+                                className="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white font-bold shadow-lg"
+                                onClick={async () => {
+                                    setReportLoading(true);
+                                    setTournamentReport('');
+                                    try {
+                                        // Build context for tournament report
+                                        let context = `Tournament: ${tournament.name}\n`;
+                                        context += `Format: ${tournament.type || 'League'}\nVenue: ${tournament.venue}\nStatus: ${tournament.status}\n`;
+                                        context += `\nTeam Standings:\n`;
+                                        teamStats.forEach(t => {
+                                            context += `  ${t.name}: P${t.played} W${t.won} L${t.lost}\n`;
+                                        });
+                                        context += `\nTotal matches played: ${matchesCount}\n`;
+                                        if (tournament.prize?.winner) {
+                                            context += `Champion: ${tournament.prize.winner}\n`;
+                                        }
+
+                                        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBXUEYw_-DHyY3Tbs44ZrBxxhV7zqAqlyI', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                contents: [{ parts: [{ text: `You are a cricket tournament analyst. Based on this tournament data, write a compelling 200-300 word tournament progress report covering team form, key trends, standout performers, and playoff predictions.\n\n${context}\n\nWrite in professional sports journalism style. No markdown headings, just flowing text with emojis for visual appeal.` }] }],
+                                                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+                                            }),
+                                        });
+                                        const data = await res.json();
+                                        if (!res.ok || data.error) {
+                                            throw new Error(data.error?.message || 'Quota limit reached');
+                                        }
+                                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Report generation failed.';
+                                        setTournamentReport(text);
+                                    } catch (err) {
+                                        console.warn('Direct Gemini API call failed, generating local progress report:', err.message);
+                                        // Build dynamic local analysis
+                                        let localReport = `🏆 TOURNAMENT PROGRESS REPORT (Local Analysis)\n\n`;
+                                        localReport += `The tournament "${tournament.name}" is currently in status "${tournament.status || 'Active'}".\n\n`;
+                                        localReport += `Team Standings Summary:\n`;
+                                        teamStats.forEach((t, i) => {
+                                            localReport += `📊 Rank ${i+1}: ${t.name} (Played: ${t.played}, Won: ${t.won}, Lost: ${t.lost})\n`;
+                                        });
+                                        localReport += `\nWith a total of ${matchesCount} match(es) played, the competition is heating up. `;
+                                        if (teamStats.length > 0) {
+                                            const leader = teamStats[0];
+                                            localReport += `${leader.name} is currently leading the table with ${leader.won} wins. `;
+                                        }
+                                        localReport += `The playoff race remains highly competitive as teams fine-tune their rosters for the crucial upcoming fixtures.`;
+                                        setTournamentReport(localReport);
+                                    } finally {
+                                        setReportLoading(false);
+                                    }
+                                }}
+                            >
+                                {reportLoading ? (
+                                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing Tournament...</>
+                                ) : (
+                                    <><Trophy className="h-4 w-4 mr-2" /> Generate Tournament Report</>
+                                )}
+                            </Button>
+
+                            {tournamentReport && (
+                                <ScrollArea className="max-h-[400px]">
+                                    <div className="bg-background/80 backdrop-blur-sm rounded-xl p-5 border border-cyan-500/10">
+                                        <div className="text-[10px] uppercase tracking-widest text-cyan-500 font-bold mb-3">AI Tournament Analysis</div>
+                                        <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{tournamentReport}</div>
+                                    </div>
+                                </ScrollArea>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {matchesCount === 0 && teamsCount === 0 && (
+                        <div className="text-center py-12 border-2 border-dashed rounded-lg text-muted-foreground">
+                            <Sparkles className="h-10 w-10 mx-auto mb-3 text-muted-foreground/40" />
+                            <p className="font-semibold">No data available yet</p>
+                            <p className="text-sm">Add teams and play matches to unlock AI-powered reports.</p>
+                        </div>
+                    )}
                 </TabsContent>
             </Tabs>
 

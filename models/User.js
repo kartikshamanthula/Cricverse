@@ -27,6 +27,14 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    permissions: {
+        liveScoreInternational: { type: Boolean, default: true },
+        liveScoreLocal: { type: Boolean, default: true },
+        teamModule: { type: Boolean, default: true },
+        matchModule: { type: Boolean, default: true },
+        tournamentModule: { type: Boolean, default: true },
+        storeModule: { type: Boolean, default: true }
+    },
 }, { timestamps: true })
 
 export default mongoose.models.User || mongoose.model("User", UserSchema)
