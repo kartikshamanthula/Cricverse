@@ -144,6 +144,6 @@ Respond naturally as a helpful shopping assistant:`;
 
     } catch (error) {
         console.error('Shop consultant API error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to get recommendation' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to get recommendation' }, { status: 500 });
     }
 }

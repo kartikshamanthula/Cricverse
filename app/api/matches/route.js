@@ -35,7 +35,8 @@ export async function GET(request) {
         const matches = await Match.find(query).sort({ matchDate: -1 });
         return NextResponse.json(matches);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Error fetching matches:', error);
+        return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 });
     }
 }
 
@@ -100,6 +101,6 @@ export async function POST(request) {
         return NextResponse.json(newMatch, { status: 201 });
     } catch (error) {
         console.error("Error creating match:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create match' }, { status: 500 });
     }
 }

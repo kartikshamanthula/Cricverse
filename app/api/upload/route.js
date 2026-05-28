@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 
 export async function POST(request) {
     try {
@@ -21,19 +19,16 @@ export async function POST(request) {
             return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 })
         }
 
+        // Convert to base64 data URL — works on Vercel serverless (no local filesystem writes)
         const bytes = await file.arrayBuffer()
         const buffer = Buffer.from(bytes)
+        const base64 = buffer.toString('base64')
+        const dataUrl = `data:${file.type};base64,${base64}`
 
-        const ext = file.name.split('.').pop()
-        const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-
-        await mkdir(uploadDir, { recursive: true })
-        await writeFile(path.join(uploadDir, uniqueName), buffer)
-
-        return NextResponse.json({ url: `/uploads/${uniqueName}` })
+        return NextResponse.json({ url: dataUrl })
     } catch (err) {
         console.error('Upload error:', err)
         return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
     }
 }
+

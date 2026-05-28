@@ -24,7 +24,8 @@ export async function GET(request, { params }) {
 
         return NextResponse.json(match);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Error fetching match:', error);
+        return NextResponse.json({ error: 'Failed to fetch match' }, { status: 500 });
     }
 }
 
@@ -51,7 +52,8 @@ export async function PUT(request, { params }) {
 
         return NextResponse.json(updatedMatch);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Error updating match:', error);
+        return NextResponse.json({ error: 'Failed to update match' }, { status: 500 });
     }
 }
 
@@ -91,6 +93,7 @@ export async function DELETE(request, { params }) {
 
         return NextResponse.json({ message: 'Match deleted successfully' });
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Error deleting match:', error);
+        return NextResponse.json({ error: 'Failed to delete match' }, { status: 500 });
     }
 }

@@ -116,6 +116,6 @@ Format the output nicely with clear sections. Use emojis for visual appeal. Make
 
     } catch (error) {
         console.error('Team optimizer API error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to optimize team' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to optimize team' }, { status: 500 });
     }
 }

@@ -38,7 +38,7 @@ export async function GET(request, { params }) {
         return NextResponse.json(
             {
                 success: false,
-                error: error.message || 'Failed to fetch tournament',
+                error: 'Failed to fetch tournament',
             },
             { status: 500 }
         );
@@ -148,7 +148,7 @@ export async function PUT(request, { params }) {
         return NextResponse.json(
             {
                 success: false,
-                error: error.message || 'Failed to update tournament',
+                error: 'Failed to update tournament',
             },
             { status: 500 }
         );
@@ -186,7 +186,7 @@ export async function DELETE(request, { params }) {
         return NextResponse.json(
             {
                 success: false,
-                error: error.message || 'Failed to delete tournament',
+                error: 'Failed to delete tournament',
             },
             { status: 500 }
         );
