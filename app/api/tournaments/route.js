@@ -43,7 +43,7 @@ export async function GET() {
         return NextResponse.json(
             {
                 success: false,
-                error: error.message || 'Failed to fetch tournaments',
+                error: 'Failed to fetch tournaments',
             },
             { status: 500 }
         );
@@ -117,7 +117,7 @@ export async function POST(request) {
         return NextResponse.json(
             {
                 success: false,
-                error: error.message || 'Failed to create tournament',
+                error: 'Failed to create tournament',
             },
             { status: 500 }
         );

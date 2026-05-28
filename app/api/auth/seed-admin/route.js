@@ -13,6 +13,7 @@ export async function GET() {
         await User.create({ username: "admin", name: "Administrator", password: hashed, role: "admin" })
         return NextResponse.json({ message: "Admin account created." })
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        console.error('Seed admin error:', error);
+        return NextResponse.json({ error: "Failed to seed admin" }, { status: 500 })
     }
 }

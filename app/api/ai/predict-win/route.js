@@ -204,6 +204,6 @@ Give a brief analytical insight about the chase. No markdown, no headings, just 
 
     } catch (error) {
         console.error('Win prediction API error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to predict win' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to predict win' }, { status: 500 });
     }
 }

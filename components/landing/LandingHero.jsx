@@ -61,7 +61,7 @@ function SpinningCricketBall3D() {
             // 1. Draw Drop Shadow on canvas (squashed ellipse below the ball)
             const shadowScale = 1 - (floatOffset / 6) * 0.12;
             const shadowAlpha = 0.35 + (floatOffset / 6) * 0.08;
-            
+
             ctx.save();
             ctx.scale(1, 0.25);
             const shadowGrad = ctx.createRadialGradient(
@@ -71,7 +71,7 @@ function SpinningCricketBall3D() {
             shadowGrad.addColorStop(0, `rgba(0, 0, 0, ${shadowAlpha})`);
             shadowGrad.addColorStop(0.5, `rgba(0, 0, 0, ${shadowAlpha * 0.4})`);
             shadowGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-            
+
             ctx.beginPath();
             ctx.arc(centerX, (centerY + R * 0.95) / 0.25, R * 0.85 * shadowScale, 0, 2 * Math.PI);
             ctx.fillStyle = shadowGrad;
@@ -226,16 +226,16 @@ function SpinningCricketBall3D() {
     };
 
     return (
-        <div 
+        <div
             onMouseMove={handleMouseMove}
             onMouseEnter={() => { isHoveredRef.current = true; }}
             onMouseLeave={() => { isHoveredRef.current = false; }}
             className="cursor-grab active:cursor-grabbing hover:scale-110 transition-all duration-300 relative w-[220px] h-[220px]"
         >
-            <canvas 
-                ref={canvasRef} 
-                width={220} 
-                height={220} 
+            <canvas
+                ref={canvasRef}
+                width={220}
+                height={220}
                 className="w-full h-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.5)]"
             />
         </div>
@@ -250,7 +250,7 @@ function WicketSet() {
             <div className="w-[3px] h-14 bg-amber-700 border-r border-amber-800/40 rounded-full shadow-[2px_0_4px_rgba(0,0,0,0.2)]" />
             <div className="w-[3px] h-14 bg-amber-700 border-r border-amber-800/40 rounded-full mx-[3px] shadow-[2px_0_4px_rgba(0,0,0,0.2)]" />
             <div className="w-[3px] h-14 bg-amber-700 border-r border-amber-800/40 rounded-full shadow-[2px_0_4px_rgba(0,0,0,0.2)]" />
-            
+
             {/* Horizontal Bail rested on top */}
             <div className="absolute top-2 w-[22px] h-[2px] bg-amber-600 border-b border-amber-700/60 rounded-full shadow-[0_1.5px_2px_rgba(0,0,0,0.4)]" />
         </div>
@@ -270,7 +270,7 @@ function LightTower3D({ direction, color }) {
     return (
         <div className="flex flex-col items-center h-36 relative" style={{ transformStyle: "preserve-3d" }}>
             {/* Glowing LED Floodlight Board */}
-            <div 
+            <div
                 style={{ transform: "translateZ(0px)" }}
                 className="w-10 h-7 bg-slate-800 rounded-sm p-[3px] border border-slate-600 flex flex-wrap gap-[3px] justify-center items-center relative shadow-lg z-10"
             >
@@ -289,8 +289,8 @@ function LightTower3D({ direction, color }) {
             <div className="w-4 h-2 bg-slate-700 rounded-sm border border-slate-800" />
 
             {/* Volumetric Spotlight Beam casting down */}
-            <div 
-                style={{ 
+            <div
+                style={{
                     ...spotlightStyles[direction],
                     clipPath: "polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%)",
                     background: `linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, ${color} 40%, transparent 100%)`
@@ -304,8 +304,8 @@ function LightTower3D({ direction, color }) {
 // 3D Stadium Terrain Component
 function Stadium3D({ mouseCoords }) {
     // Map mouse normalized coordinates to slight 3D rotation angles
-    const rotX = mouseCoords.y * 14; 
-    const rotY = -mouseCoords.x * 14; 
+    const rotX = mouseCoords.y * 14;
+    const rotY = -mouseCoords.x * 14;
 
     return (
         <div className="relative w-full h-[400px] flex items-center justify-center [perspective:1200px]">
@@ -325,7 +325,7 @@ function Stadium3D({ mouseCoords }) {
                 <div className="absolute inset-0 bg-black/45 blur-2xl rounded-full translate-z-[-20px] scale-95" />
 
                 {/* 2. Grass Field Circle */}
-                <div 
+                <div
                     style={{ transform: "translateZ(0px)", transformStyle: "preserve-3d" }}
                     className="absolute inset-0 rounded-full bg-gradient-to-tr from-emerald-800 via-emerald-600 to-green-700 border-4 border-emerald-400/30 overflow-hidden shadow-[inset_0_0_60px_rgba(0,0,0,0.75)] flex items-center justify-center"
                 >
@@ -342,7 +342,7 @@ function Stadium3D({ mouseCoords }) {
                     <div className="absolute w-12 h-40 bg-amber-100/90 rounded-sm border-x border-amber-900/25 shadow-md flex flex-col justify-between py-2 overflow-hidden">
                         {/* Realistic grass/soil textures */}
                         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:4px_4px]" />
-                        
+
                         {/* White Chalk Creases */}
                         <div className="w-full h-[1.5px] bg-white/80" />
                         <div className="w-full h-[1.5px] bg-white/80" />
@@ -351,7 +351,7 @@ function Stadium3D({ mouseCoords }) {
 
                 {/* 3. Vertical Wicket Sets at Pitch Ends */}
                 {/* Wicket Set 1 (Top End) */}
-                <div 
+                <div
                     style={{ transform: "translateX(-50%) translateY(-75px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom flex gap-[5px]"
                 >
@@ -359,7 +359,7 @@ function Stadium3D({ mouseCoords }) {
                 </div>
 
                 {/* Wicket Set 2 (Bottom End) */}
-                <div 
+                <div
                     style={{ transform: "translateX(-50%) translateY(75px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom flex gap-[5px]"
                 >
@@ -368,7 +368,7 @@ function Stadium3D({ mouseCoords }) {
 
                 {/* 4. Industrial Stadium Light Towers (Stood straight up perpendicular to field plane) */}
                 {/* Light Tower 1 (Top-Left Corner) */}
-                <div 
+                <div
                     style={{ transform: "translateX(-135px) translateY(-135px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom"
                 >
@@ -376,7 +376,7 @@ function Stadium3D({ mouseCoords }) {
                 </div>
 
                 {/* Light Tower 2 (Top-Right Corner) */}
-                <div 
+                <div
                     style={{ transform: "translateX(115px) translateY(-135px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom"
                 >
@@ -384,7 +384,7 @@ function Stadium3D({ mouseCoords }) {
                 </div>
 
                 {/* Light Tower 3 (Bottom-Left Corner) */}
-                <div 
+                <div
                     style={{ transform: "translateX(-135px) translateY(115px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom"
                 >
@@ -392,7 +392,7 @@ function Stadium3D({ mouseCoords }) {
                 </div>
 
                 {/* Light Tower 4 (Bottom-Right Corner) */}
-                <div 
+                <div
                     style={{ transform: "translateX(115px) translateY(115px) translateZ(0px) rotateX(-90deg)", transformStyle: "preserve-3d" }}
                     className="absolute left-1/2 top-1/2 origin-bottom"
                 >
@@ -421,7 +421,7 @@ export function LandingHero() {
     // Slow circular drift autoplay when user is not hovering, ensuring responsive animation on all platforms
     useEffect(() => {
         if (isHovered) return;
-        
+
         let frameId;
         let time = 0;
         const updateAutoplay = () => {
@@ -432,7 +432,7 @@ export function LandingHero() {
             });
             frameId = requestAnimationFrame(updateAutoplay);
         };
-        
+
         frameId = requestAnimationFrame(updateAutoplay);
         return () => cancelAnimationFrame(frameId);
     }, [isHovered]);
@@ -463,7 +463,7 @@ export function LandingHero() {
     ];
 
     return (
-        <div 
+        <div
             ref={heroRef}
             onMouseMove={handleHeroMouseMove}
             onMouseEnter={() => setIsHovered(true)}
@@ -531,7 +531,7 @@ export function LandingHero() {
             {/* Split Dual-Pane Main Hero Section */}
             <div className="flex-1 flex flex-col justify-center px-4 md:px-8 z-10 pt-32 lg:pt-36 pb-12 w-full max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
-                    
+
                     {/* Left Column: Premium Interactive Typography */}
                     <motion.div
                         suppressHydrationWarning
@@ -548,7 +548,7 @@ export function LandingHero() {
                         className="col-span-1 lg:col-span-7 flex flex-col items-start text-left space-y-7 z-10"
                     >
                         {/* Live Update Ticker Badge */}
-                        <motion.div 
+                        <motion.div
                             style={{ translateZ: "40px" }}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold tracking-wide border border-primary/20 backdrop-blur-sm shadow-lg shadow-primary/5 select-none"
                         >
@@ -560,7 +560,7 @@ export function LandingHero() {
                         </motion.div>
 
                         {/* Title Float Depth */}
-                        <motion.h1 
+                        <motion.h1
                             style={{ translateZ: "60px" }}
                             className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[1.05] text-foreground drop-shadow-xl"
                         >
@@ -571,7 +571,7 @@ export function LandingHero() {
                         </motion.h1>
 
                         {/* Description Paragraph */}
-                        <motion.p 
+                        <motion.p
                             style={{ translateZ: "30px" }}
                             className="text-lg md:text-xl text-muted-foreground font-medium max-w-xl leading-relaxed"
                         >
@@ -579,7 +579,7 @@ export function LandingHero() {
                         </motion.p>
 
                         {/* CTAs */}
-                        <motion.div 
+                        <motion.div
                             style={{ translateZ: "45px" }}
                             className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto"
                         >
@@ -622,12 +622,12 @@ export function LandingHero() {
                     >
                         {/* Glowing backdrop spotlight */}
                         <div className="absolute w-[360px] h-[360px] bg-primary/10 rounded-full blur-[100px] pointer-events-none mix-blend-screen animate-pulse" />
-                        
+
                         {/* 3D Stadium Element */}
                         <Stadium3D mouseCoords={mouseCoords} />
 
                         {/* Photorealistic 3D Spinning Leather Ball suspended above the pitch */}
-                        <motion.div 
+                        <motion.div
                             style={{
                                 transformStyle: "preserve-3d",
                                 // Parallax separation: Ball tilts and offsets slightly deeper/closer than stadium based on mouse
@@ -647,12 +647,12 @@ export function LandingHero() {
                     transition={{ delay: 0.8, duration: 0.8 }}
                     className="w-full overflow-hidden mt-16 relative z-10 before:absolute before:left-0 before:top-0 before:w-16 before:h-full before:bg-gradient-to-r before:from-background before:to-transparent before:z-10 after:absolute after:right-0 after:top-0 after:w-16 after:h-full after:bg-gradient-to-l after:from-background after:to-transparent after:z-10"
                 >
-                     <motion.div
+                    <motion.div
                         className="flex gap-4 whitespace-nowrap"
                         animate={{ x: ["0%", "-50%"] }}
                         transition={{ ease: "linear", duration: 25, repeat: Infinity }}
                     >
-                         {/* Double array for seamless infinite looping */}
+                        {/* Double array for seamless infinite looping */}
                         {[...liveMatches, ...liveMatches].map((match, idx) => (
                             <div key={`${match.id}-${idx}`} className="flex-none bg-background/40 backdrop-blur-md border border-border/40 rounded-xl p-3 flex items-center gap-4 min-w-[300px] shadow-sm hover:bg-background/80 transition-colors cursor-default">
                                 <div className="flex flex-col gap-1 flex-1">
@@ -738,9 +738,9 @@ export function LandingHero() {
                                 Create teams, manage expansive rosters with detailed player profiles, assign roles, and track individual career statistics flawlessly over multiple seasons.
                             </p>
                             <ul className="space-y-2 text-sm font-medium text-muted-foreground">
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary"/> Player Profiles</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary"/> Career Analytics</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary"/> Roster Building</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Player Profiles</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Career Analytics</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Roster Building</li>
                             </ul>
                         </motion.div>
 
@@ -762,9 +762,9 @@ export function LandingHero() {
                                 Broadcast matches live to your fans anywhere. Our intuitive ball-by-ball scorer interface makes capturing complex game states incredibly simple.
                             </p>
                             <ul className="space-y-2 text-sm font-medium text-muted-foreground">
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"/> Ball-by-Ball Logging</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"/> Real-time Fan View</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"/> Wagon Wheels</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Ball-by-Ball Logging</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Real-time Fan View</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Wagon Wheels</li>
                             </ul>
                         </motion.div>
 
@@ -786,9 +786,9 @@ export function LandingHero() {
                                 Equip your league with the best. Access our integrated marketplace for official merchandise, professional bats, pads, and league-certified balls.
                             </p>
                             <ul className="space-y-2 text-sm font-medium text-muted-foreground">
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"/> Premium Bats</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"/> Custom Jerseys</li>
-                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"/> Safe Checkout</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Premium Bats</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Custom Jerseys</li>
+                                <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Safe Checkout</li>
                             </ul>
                         </motion.div>
                     </div>
@@ -805,7 +805,7 @@ export function LandingHero() {
                         transition={{ duration: 0.8 }}
                         className="flex-1 space-y-8"
                     >
-                        <h2 className="text-4xl md:text-5xl font-black leading-tight">Trusted by The Global<br/>Cricket Community</h2>
+                        <h2 className="text-4xl md:text-5xl font-black leading-tight">Trusted by The Global<br />Cricket Community</h2>
                         <p className="text-xl text-muted-foreground leading-relaxed">
                             Numbers speak louder than words. We've built the most reliable, high-performance platform to ensure your matches are recorded and preserved forever.
                         </p>
@@ -843,7 +843,7 @@ export function LandingHero() {
                         </div>
                         <div className="bg-muted/30 backdrop-blur-lg p-8 rounded-3xl border border-border/50 flex flex-col items-center justify-center text-center lg:translate-y-12">
                             <div className="text-5xl font-black text-purple-500 mb-3">
-                                <AnimatedCounter value={99} />.<AnimatedCounter value={9} duration={3}/>%
+                                <AnimatedCounter value={99} />.<AnimatedCounter value={9} duration={3} />%
                             </div>
                             <div className="font-semibold text-foreground/80">Platform Uptime</div>
                         </div>
@@ -884,7 +884,7 @@ export function LandingHero() {
                                 <p className="text-foreground/90 leading-relaxed mb-6 flex-1 text-base">"{t.text}"</p>
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center font-bold text-primary border border-primary/30">
-                                        {t.name.split(' ').map(n=>n[0]).join('')}
+                                        {t.name.split(' ').map(n => n[0]).join('')}
                                     </div>
                                     <div>
                                         <div className="font-bold">{t.name}</div>
@@ -947,7 +947,7 @@ export function LandingHero() {
                             The world's most advanced digital platform for cricket leagues, teams, and fans. Managing the game logic so you can focus on playing.
                         </p>
                     </div>
-                    
+
                     <div className="space-y-4">
                         <h4 className="text-lg font-bold text-white mb-6">Platform</h4>
                         <ul className="space-y-3">
@@ -957,7 +957,7 @@ export function LandingHero() {
                             <li><Link href="#" className="hover:text-primary transition-colors">Premium Store</Link></li>
                         </ul>
                     </div>
-                    
+
                     <div className="space-y-4">
                         <h4 className="text-lg font-bold text-white mb-6">Company</h4>
                         <ul className="space-y-3">

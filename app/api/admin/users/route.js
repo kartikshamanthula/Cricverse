@@ -8,6 +8,7 @@ export async function GET() {
         const users = await User.find({}).sort({ createdAt: -1 }).select("-password")
         return NextResponse.json(users)
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+        console.error('Error fetching users:', error);
+        return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
     }
 }

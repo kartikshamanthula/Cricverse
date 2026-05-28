@@ -47,7 +47,6 @@ export async function POST(request, { params }) {
             {
                 success: false,
                 error: 'Failed to add player',
-                message: error.message,
             },
             { status: 500 }
         );
@@ -102,7 +101,6 @@ export async function DELETE(request, { params }) {
             {
                 success: false,
                 error: 'Failed to remove player',
-                message: error.message,
             },
             { status: 500 }
         );

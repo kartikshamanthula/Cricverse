@@ -1271,19 +1271,18 @@ export default function TournamentDetailsPage() {
                                             context += `Champion: ${tournament.prize.winner}\n`;
                                         }
 
-                                        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBXUEYw_-DHyY3Tbs44ZrBxxhV7zqAqlyI', {
+                                        const res = await fetch('/api/ai/tournament-report', {
                                             method: 'POST',
                                             headers: { 'Content-Type': 'application/json' },
                                             body: JSON.stringify({
-                                                contents: [{ parts: [{ text: `You are a cricket tournament analyst. Based on this tournament data, write a compelling 200-300 word tournament progress report covering team form, key trends, standout performers, and playoff predictions.\n\n${context}\n\nWrite in professional sports journalism style. No markdown headings, just flowing text with emojis for visual appeal.` }] }],
-                                                generationConfig: { temperature: 0.7, maxOutputTokens: 1024 },
+                                                prompt: `You are a cricket tournament analyst. Based on this tournament data, write a compelling 200-300 word tournament progress report covering team form, key trends, standout performers, and playoff predictions.\n\n${context}\n\nWrite in professional sports journalism style. No markdown headings, just flowing text with emojis for visual appeal.`,
                                             }),
                                         });
                                         const data = await res.json();
                                         if (!res.ok || data.error) {
                                             throw new Error(data.error?.message || 'Quota limit reached');
                                         }
-                                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Report generation failed.';
+                                        const text = data.report || 'Report generation failed.';
                                         setTournamentReport(text);
                                     } catch (err) {
                                         console.warn('Direct Gemini API call failed, generating local progress report:', err.message);

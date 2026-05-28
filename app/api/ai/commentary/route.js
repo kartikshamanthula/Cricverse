@@ -175,6 +175,6 @@ Based on the CURRENT match situation above, write a vivid, engaging 3-4 sentence
         return NextResponse.json({ commentary, persona });
     } catch (error) {
         console.error('Commentary API error:', error);
-        return NextResponse.json({ error: error.message || 'Failed to generate commentary' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to generate commentary' }, { status: 500 });
     }
 }

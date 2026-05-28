@@ -32,7 +32,7 @@ export async function GET() {
             {
                 success: false,
                 error: 'Connection failed',
-                message: error.message,
+                message: 'Failed to establish connection to database',
                 timestamp: new Date().toISOString(),
             },
             { status: 500 }

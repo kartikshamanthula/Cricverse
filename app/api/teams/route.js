@@ -42,7 +42,6 @@ export async function GET(request) {
             {
                 success: false,
                 error: 'Failed to fetch teams',
-                message: error.message,
             },
             { status: 500 }
         );
@@ -102,21 +101,16 @@ export async function POST(request) {
                 {
                     success: false,
                     error: 'Validation error',
-                    message: error.message,
+                    details: error.message,
                 },
                 { status: 400 }
             );
         }
 
-        const logPath = path.join(process.cwd(), 'api_debug.log');
-        fs.appendFileSync(logPath, `ERROR: ${error.message}\nStack: ${error.stack}\n`);
-
         return NextResponse.json(
             {
                 success: false,
                 error: 'Failed to create team',
-                message: error.message,
-                details: error.code === 11000 ? 'Duplicate team name' : error.stack
             },
             { status: 500 }
         );

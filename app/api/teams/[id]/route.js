@@ -47,7 +47,6 @@ export async function GET(request, { params }) {
             {
                 success: false,
                 error: 'Failed to fetch team',
-                message: error.message,
             },
             { status: 500 }
         );
@@ -103,7 +102,7 @@ export async function PUT(request, { params }) {
                 {
                     success: false,
                     error: 'Validation error',
-                    message: error.message,
+                    details: error.message,
                 },
                 { status: 400 }
             );
@@ -113,7 +112,6 @@ export async function PUT(request, { params }) {
             {
                 success: false,
                 error: 'Failed to update team',
-                message: error.message,
             },
             { status: 500 }
         );
@@ -153,7 +151,6 @@ export async function DELETE(request, { params }) {
             {
                 success: false,
                 error: 'Failed to delete team',
-                message: error.message,
             },
             { status: 500 }
         );
