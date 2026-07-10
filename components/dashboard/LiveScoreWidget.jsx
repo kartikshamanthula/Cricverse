@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Calendar, RefreshCw, Swords, ChevronRight } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, Swords, ChevronRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -792,8 +792,16 @@ export function LiveScoreWidget() {
 
             {/* ── Content Grid ── */}
             {error && category === 'international' ? (
-                <div className="rounded-xl border border-destructive/30 bg-destructive/10 text-destructive text-sm px-4 py-3">
-                    {error}
+                <div className="flex flex-col items-center justify-center py-16 px-4 gap-4 rounded-xl border border-dashed border-yellow-500/30 bg-yellow-500/5 text-center">
+                    <div className="h-12 w-12 rounded-full bg-yellow-500/10 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+                        <Wrench className="h-6 w-6" />
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="font-bold text-lg text-foreground">Feature Under Maintenance</h3>
+                        <p className="text-sm text-muted-foreground max-w-md">
+                            Right now this feature is under working. Please try again later.
+                        </p>
+                    </div>
                 </div>
             ) : category === 'local' ? (
                 /* LOCAL MATCHES */

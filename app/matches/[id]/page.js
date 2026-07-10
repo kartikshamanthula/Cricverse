@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
-import { ChevronLeft, Trophy, Users, Target, Calendar, MapPin, Clock, Printer, Share2, Mic, Brain, Volume2, VolumeX, Loader2, Sparkles } from 'lucide-react';
+import { ChevronLeft, Trophy, Users, Target, Calendar, MapPin, Clock, Printer, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,13 +24,7 @@ export default function MatchDetailsPage() {
     const printRef = useRef(null);
     const [currentUser, setCurrentUser] = useState(null);
 
-    // AI Feature States
-    const [aiCommentary, setAiCommentary] = useState('');
-    const [commentaryPersona, setCommentaryPersona] = useState('excited');
-    const [commentaryLoading, setCommentaryLoading] = useState(false);
-    const [isVoiceActive, setIsVoiceActive] = useState(false);
-    const [winPrediction, setWinPrediction] = useState(null);
-    const [winPredictionLoading, setWinPredictionLoading] = useState(false);
+
 
     useEffect(() => {
         setIsMounted(true);
@@ -268,61 +262,7 @@ export default function MatchDetailsPage() {
         }
     };
 
-    // AI Feature Handlers
-    const generateCommentary = async () => {
-        if (!id) return;
-        setCommentaryLoading(true);
-        try {
-            const res = await fetch('/api/ai/commentary', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ matchId: id, persona: commentaryPersona }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to generate commentary');
-            setAiCommentary(data.commentary);
-        } catch (err) {
-            toast.error(err.message || 'Failed to generate AI commentary');
-        } finally {
-            setCommentaryLoading(false);
-        }
-    };
 
-    const speakCommentary = (text) => {
-        if (!text || !window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.95;
-        utterance.pitch = 1.1;
-        utterance.onend = () => setIsVoiceActive(false);
-        utterance.onerror = () => setIsVoiceActive(false);
-        setIsVoiceActive(true);
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const stopSpeech = () => {
-        window.speechSynthesis?.cancel();
-        setIsVoiceActive(false);
-    };
-
-    const fetchWinPrediction = async () => {
-        if (!id) return;
-        setWinPredictionLoading(true);
-        try {
-            const res = await fetch('/api/ai/predict-win', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ matchId: id }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to predict');
-            setWinPrediction(data);
-        } catch (err) {
-            toast.error(err.message || 'Failed to get win prediction');
-        } finally {
-            setWinPredictionLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -794,160 +734,7 @@ export default function MatchDetailsPage() {
                     </Card>
                 </div>
 
-                {/* ═══════ AI BROADCAST CENTER ═══════ */}
-                {firstInningsScore && (
-                    <div className="mb-6 space-y-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                                <Sparkles className="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-black tracking-tight">AI Broadcast Center</h2>
-                                <p className="text-xs text-muted-foreground font-medium">Powered by Google Gemini</p>
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* AI Live Commentary Card */}
-                            <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-pink-500/5 overflow-hidden relative">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Mic className="h-5 w-5 text-purple-500" />
-                                        AI Live Commentary
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {/* Persona Selector */}
-                                    <div className="flex gap-2 flex-wrap">
-                                        {[
-                                            { key: 'excited', label: '🔥 Excited', color: 'bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400' },
-                                            { key: 'analytical', label: '📊 Analytical', color: 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400' },
-                                            { key: 'sarcastic', label: '🎙️ Witty', color: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400' },
-                                        ].map((p) => (
-                                            <button
-                                                key={p.key}
-                                                onClick={() => setCommentaryPersona(p.key)}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-300 ${
-                                                    commentaryPersona === p.key
-                                                        ? `${p.color} ring-2 ring-offset-1 ring-offset-background ring-current scale-105`
-                                                        : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50'
-                                                }`}
-                                            >
-                                                {p.label}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* Generate Button Row */}
-                                    <div className="flex gap-2">
-                                        <Button
-                                            onClick={generateCommentary}
-                                            disabled={commentaryLoading}
-                                            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg shadow-purple-500/25"
-                                            size="sm"
-                                        >
-                                            {commentaryLoading ? (
-                                                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                                            ) : (
-                                                <><Mic className="h-4 w-4 mr-2" /> Generate Commentary</>
-                                            )}
-                                        </Button>
-                                        {aiCommentary && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => isVoiceActive ? stopSpeech() : speakCommentary(aiCommentary)}
-                                                className={`shrink-0 ${isVoiceActive ? 'border-purple-500 text-purple-500 bg-purple-500/10' : ''}`}
-                                            >
-                                                {isVoiceActive ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {/* Commentary Display */}
-                                    {aiCommentary && (
-                                        <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-purple-500/10 relative">
-                                            <div className="absolute top-2 right-2">
-                                                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-500 border-0">
-                                                    {commentaryPersona}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm leading-relaxed pr-16 italic text-foreground/90">
-                                                "{aiCommentary}"
-                                            </p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            {/* AI Win Predictor Card */}
-                            <Card className="border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-amber-500/5 overflow-hidden relative">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-amber-500" />
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Brain className="h-5 w-5 text-cyan-500" />
-                                        AI Win Predictor
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <Button
-                                        onClick={fetchWinPrediction}
-                                        disabled={winPredictionLoading}
-                                        className="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white font-bold shadow-lg shadow-cyan-500/25"
-                                        size="sm"
-                                    >
-                                        {winPredictionLoading ? (
-                                            <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing...</>
-                                        ) : (
-                                            <><Brain className="h-4 w-4 mr-2" /> Predict Winner</>
-                                        )}
-                                    </Button>
-
-                                    {winPrediction && (
-                                        <div className="space-y-3">
-                                            {/* Team Names */}
-                                            <div className="flex justify-between items-center text-sm font-bold">
-                                                <span className="text-cyan-500">{winPrediction.teamA.name}</span>
-                                                <span className="text-amber-500">{winPrediction.teamB.name}</span>
-                                            </div>
-
-                                            {/* Probability Bar */}
-                                            <div className="relative h-8 rounded-full overflow-hidden bg-muted/30 border border-border/50">
-                                                <div
-                                                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all duration-1000 ease-out rounded-l-full"
-                                                    style={{ width: `${winPrediction.teamA.probability}%` }}
-                                                />
-                                                <div
-                                                    className="absolute inset-y-0 right-0 bg-gradient-to-l from-amber-500 to-amber-400 transition-all duration-1000 ease-out rounded-r-full"
-                                                    style={{ width: `${winPrediction.teamB.probability}%` }}
-                                                />
-                                                <div className="absolute inset-0 flex items-center justify-between px-3">
-                                                    <span className="text-xs font-black text-white drop-shadow-md">{winPrediction.teamA.probability}%</span>
-                                                    <span className="text-xs font-black text-white drop-shadow-md">{winPrediction.teamB.probability}%</span>
-                                                </div>
-                                            </div>
-
-                                            {/* AI Insight */}
-                                            {winPrediction.insight && (
-                                                <div className="bg-background/60 backdrop-blur-sm rounded-xl p-3 border border-cyan-500/10">
-                                                    <p className="text-xs leading-relaxed text-foreground/80">
-                                                        <span className="font-bold text-cyan-500">💡 AI Insight:</span>{' '}
-                                                        {winPrediction.insight}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                                                Phase: {winPrediction.phase?.replace('-', ' ')}
-                                            </Badge>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                )}
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 no-print">
