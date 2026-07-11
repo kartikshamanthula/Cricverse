@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -106,6 +107,14 @@ export default function MatchScorePage() {
                     });
                     setBatsmanStats(restoredBatsmanStats);
 
+                    // Restore dismissed batsmen from isOut flags
+                    const dismissed = savedInnings.battingStats
+                        ?.filter(p => p.isOut)
+                        .map(p => p.playerId) || [];
+                    if (dismissed.length > 0) {
+                        setDismissedBatsmen(dismissed);
+                    }
+
                     const restoredBowlerStats = {};
                     savedInnings.bowlingStats?.forEach(p => {
                         restoredBowlerStats[p.playerId] = {
@@ -117,9 +126,28 @@ export default function MatchScorePage() {
                     });
                     setBowlerStats(restoredBowlerStats);
 
-                    // Restore current striker/non-striker/bowler if saved? 
-                    // Schema doesn't strictly have "currentStrikerId", but we can maybe infer or default.
-                    // For now, let the initial selection logic handle it if not explicit.
+                    // Restore current striker/non-striker/bowler from saved innings data
+                    // This handles the case where user navigates away and returns (URL params are lost)
+                    const cp = savedInnings.currentPlayers;
+                    const urlStriker = searchParams.get('striker');
+                    const urlNonStriker = searchParams.get('nonStriker');
+                    const urlBowler = searchParams.get('bowler');
+
+                    // Only restore from DB if URL params are absent (user returned to page without params)
+                    if (!urlStriker && !urlNonStriker && cp) {
+                        if (cp.striker?.playerId) setStrikerId(cp.striker.playerId);
+                        if (cp.nonStriker?.playerId) setNonStrikerId(cp.nonStriker.playerId);
+                    }
+
+                    if (!urlBowler && cp?.bowler?.playerId) {
+                        setCurrentBowlerId(cp.bowler.playerId);
+                        setBowler({
+                            name: cp.bowler.playerName || cp.bowler.name || 'Bowler',
+                            overs: cp.bowler.overs || 0,
+                            runs: cp.bowler.runs || 0,
+                            wickets: cp.bowler.wickets || 0
+                        });
+                    }
                 }
 
                 // Load first innings score if we're in second innings
@@ -1162,6 +1190,14 @@ export default function MatchScorePage() {
                 {/* Info Strip */}
                 <div className="bg-white/5 p-3 flex justify-between items-center text-xs md:text-sm text-white/70 backdrop-blur-md border-t border-white/10">
                     <span>🏟️ {matchData?.venue || matchData?.battingTeam?.homeGround || matchData?.bowlingTeam?.homeGround || 'Cricket Stadium'}</span>
+                    <Link
+                        href={`/matches/${id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold bg-white/10 hover:bg-white/20 border border-white/15 px-3 py-1 rounded-sm transition-colors text-white hover:text-white"
+                    >
+                        View Match Details ↗
+                    </Link>
                 </div>
             </div>
 
@@ -1191,7 +1227,11 @@ export default function MatchScorePage() {
                                 </div>
                                 <div className="flex gap-4">
                                     <Button disabled={inningsComplete} className="flex-1 h-12 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed" variant="secondary" onClick={undoLastBall}><RefreshCw className="mr-2 h-4 w-4" /> Undo Last Ball</Button>
-                                    {/* <Button disabled={inningsComplete} className="flex-1 h-12 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed" variant="outline">End Over</Button> */}
+                                    <Link href={`/matches/${id}`} className="flex-1">
+                                        <Button className="w-full h-12 text-base font-semibold" variant="outline">
+                                            Match Details
+                                        </Button>
+                                    </Link>
                                 </div>
                                 {inningsComplete && (
                                     <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg text-center">

@@ -23,6 +23,9 @@ export default function TournamentsPage() {
         try {
             setIsLoading(true);
             const response = await fetch('/api/tournaments');
+            
+            if (response.status === 401) return; // Silently ignore on logout
+            
             const data = await response.json();
 
             if (!response.ok) {

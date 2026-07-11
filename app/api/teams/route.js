@@ -28,6 +28,7 @@ export async function GET(request) {
         }
 
         const teams = await Team.find(query)
+            .populate('players')
             .sort({ createdAt: -1 })
             .lean();
 

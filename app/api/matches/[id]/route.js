@@ -8,10 +8,6 @@ import { getServerSession } from '@/lib/auth';
 export async function GET(request, { params }) {
     try {
         await connectToDatabase();
-        const session = await getServerSession();
-        if (!session) {
-            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-        }
 
         const { id } = await params;
         const match = await Match.findOne({ _id: id })

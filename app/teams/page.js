@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Trash2, Users, Edit, Brain, Loader2, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Users, Edit, Loader2 } from 'lucide-react';
 import { RosterModal } from '@/components/teams/RosterModal';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -46,14 +46,7 @@ function TeamsPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [teamToDelete, setTeamToDelete] = useState(null);
 
-    // AI Simulator States
-    const [aiSimOpen, setAiSimOpen] = useState(false);
-    const [simTeamA, setSimTeamA] = useState('');
-    const [simTeamB, setSimTeamB] = useState('');
-    const [simPitch, setSimPitch] = useState('Flat');
-    const [simWeather, setSimWeather] = useState('Sunny');
-    const [simLoading, setSimLoading] = useState(false);
-    const [simResult, setSimResult] = useState(null);
+
 
     useEffect(() => {
         fetchTeams();
@@ -65,6 +58,8 @@ function TeamsPage() {
             setError(null);
 
             const response = await fetch('/api/teams');
+            if (response.status === 401) return; // Silently ignore on logout
+            
             const data = await response.json();
 
             if (!response.ok) {
@@ -135,37 +130,7 @@ function TeamsPage() {
         }
     };
 
-    const runSimulation = async () => {
-        if (!simTeamA || !simTeamB) {
-            toast.error('Please select both teams');
-            return;
-        }
-        if (simTeamA === simTeamB) {
-            toast.error('Please select different teams');
-            return;
-        }
-        setSimLoading(true);
-        setSimResult(null);
-        try {
-            const res = await fetch('/api/ai/optimize-team', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    teamAId: simTeamA,
-                    teamBId: simTeamB,
-                    pitchType: simPitch,
-                    weather: simWeather,
-                }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Simulation failed');
-            setSimResult(data);
-        } catch (err) {
-            toast.error(err.message || 'Failed to run simulation');
-        } finally {
-            setSimLoading(false);
-        }
-    };
+
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -175,14 +140,6 @@ function TeamsPage() {
                     <p className="text-muted-foreground text-base sm:text-lg">Manage squads and player rosters.</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
-                    <Button
-                        onClick={() => { setAiSimOpen(true); setSimResult(null); }}
-                        disabled={teams.length < 2}
-                        className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg shadow-purple-500/25"
-                        size="lg"
-                    >
-                        <Brain className="mr-2 h-5 w-5" /> AI Simulator
-                    </Button>
                     <Button asChild size="lg" className="flex-1 sm:flex-none font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
                         <Link href="/teams/create">
                             <Plus className="mr-2 h-5 w-5" /> Register Team
@@ -345,105 +302,6 @@ function TeamsPage() {
                             Delete Team
                         </Button>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* AI Match Simulator Dialog */}
-            <Dialog open={aiSimOpen} onOpenChange={setAiSimOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 text-xl">
-                            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                <Sparkles className="h-4 w-4 text-white" />
-                            </div>
-                            AI Match Simulator & Lineup Optimizer
-                        </DialogTitle>
-                        <DialogDescription>
-                            Select two teams, set match conditions, and let AI simulate the match with tactical insights.
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="space-y-4 py-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Team A</Label>
-                                <Select value={simTeamA} onValueChange={setSimTeamA}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Team A" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teams.map((t) => (
-                                            <SelectItem key={t.id} value={t.id} disabled={simTeamB === t.id}>
-                                                {t.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Team B</Label>
-                                <Select value={simTeamB} onValueChange={setSimTeamB}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Team B" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teams.map((t) => (
-                                            <SelectItem key={t.id} value={t.id} disabled={simTeamA === t.id}>
-                                                {t.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label>Pitch Type</Label>
-                                <Select value={simPitch} onValueChange={setSimPitch}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Flat">🏏 Flat Track</SelectItem>
-                                        <SelectItem value="Green">🌿 Green Top</SelectItem>
-                                        <SelectItem value="Dusty">🌾 Dusty / Turning</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Weather</Label>
-                                <Select value={simWeather} onValueChange={setSimWeather}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Sunny">☀️ Sunny</SelectItem>
-                                        <SelectItem value="Overcast">☁️ Overcast</SelectItem>
-                                        <SelectItem value="Dew">🌙 Evening Dew</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <Button
-                            onClick={runSimulation}
-                            disabled={simLoading || !simTeamA || !simTeamB}
-                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg"
-                        >
-                            {simLoading ? (
-                                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Simulating Match...</>
-                            ) : (
-                                <><Brain className="h-4 w-4 mr-2" /> Run Simulation</>
-                            )}
-                        </Button>
-                    </div>
-
-                    {simResult && (
-                        <ScrollArea className="flex-1 max-h-[50vh] mt-2">
-                            <div className="bg-gray-950 text-green-400 rounded-xl p-5 font-mono text-sm leading-relaxed whitespace-pre-wrap border border-green-500/20">
-                                <div className="flex items-center gap-2 mb-3 text-green-300 text-xs">
-                                    <span className="inline-block h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                                    AI MATCH SIMULATION — {simResult.teamA.name} vs {simResult.teamB.name}
-                                </div>
-                                <div className="text-green-200/90">{simResult.analysis}</div>
-                            </div>
-                        </ScrollArea>
-                    )}
                 </DialogContent>
             </Dialog>
         </div>

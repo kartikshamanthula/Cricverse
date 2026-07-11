@@ -1,13 +1,6 @@
 import mongoose from 'mongoose';
 
-const PlayerSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: [true, 'Player name is required'],
-        trim: true,
-    },
-});
-
+// We now reference the global Player model instead of a local sub-document
 const TeamSchema = new mongoose.Schema(
     {
         name: {
@@ -35,7 +28,10 @@ const TeamSchema = new mongoose.Schema(
             enum: ['active', 'inactive'],
             default: 'active',
         },
-        players: [PlayerSchema],
+        players: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Player'
+        }],
         stats: {
             played: { type: Number, default: 0 },
             won: { type: Number, default: 0 },
@@ -55,11 +51,13 @@ const TeamSchema = new mongoose.Schema(
 // Indexes for better query performance
 TeamSchema.index({ name: 1, createdBy: 1 }, { unique: true });
 TeamSchema.index({ status: 1, createdAt: -1 });
-TeamSchema.index({ 'players.name': 1 });
 
-// Method to add a player
-TeamSchema.methods.addPlayer = function (playerData) {
-    this.players.push(playerData);
+
+// Method to add a player (expects a valid Player ObjectId)
+TeamSchema.methods.addPlayer = function (playerId) {
+    if (!this.players.includes(playerId)) {
+        this.players.push(playerId);
+    }
     return this.save();
 };
 

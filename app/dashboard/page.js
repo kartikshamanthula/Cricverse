@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Plus, Trophy } from 'lucide-react';
 import { LiveScoreWidget } from '@/components/dashboard/LiveScoreWidget';
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
@@ -28,7 +29,9 @@ export default function Home() {
       </section>
 
       {/* Live Scores Section */}
-      <LiveScoreWidget />
+      <Suspense fallback={<div className="text-center py-8 text-muted-foreground animate-pulse font-semibold">Loading live scores...</div>}>
+        <LiveScoreWidget />
+      </Suspense>
     </div>
   );
 }

@@ -4,17 +4,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
-import { ChevronLeft, Trophy, Users, Target, Calendar, MapPin, Clock, Printer, Share2, Mic, Brain, Volume2, VolumeX, Loader2, Sparkles } from 'lucide-react';
+import { ChevronLeft, Trophy, Users, Target, Calendar, MapPin, Clock, Printer, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import ShareCardModal from '@/components/matches/ShareCardModal';
 
-export default function MatchDetailsPage() {
+export default function MatchDetailsPage({ overrideMatchId, isSpectator = false }) {
     const params = useParams();
-    const id = params?.id;
+    const id = overrideMatchId || params?.id;
     const router = useRouter();
     const [matchData, setMatchData] = useState(null);
     const [firstInningsScore, setFirstInningsScore] = useState(null);
@@ -23,19 +24,190 @@ export default function MatchDetailsPage() {
     const [isSharing, setIsSharing] = useState(false);
     const printRef = useRef(null);
     const [currentUser, setCurrentUser] = useState(null);
+    const isSpectateMode = isSpectator || (isMounted && typeof window !== 'undefined' && window.location.search.includes('spectate=true'));
 
-    // AI Feature States
-    const [aiCommentary, setAiCommentary] = useState('');
-    const [commentaryPersona, setCommentaryPersona] = useState('excited');
-    const [commentaryLoading, setCommentaryLoading] = useState(false);
-    const [isVoiceActive, setIsVoiceActive] = useState(false);
-    const [winPrediction, setWinPrediction] = useState(null);
-    const [winPredictionLoading, setWinPredictionLoading] = useState(false);
+    const [ttsEnabled, setTtsEnabled] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [floatingEmojis, setFloatingEmojis] = useState([]);
+    const [reactionCounts, setReactionCounts] = useState({ clap: 0, fire: 0, shock: 0, celebrate: 0 });
+
+    const ttsEnabledRef = useRef(false);
+    const lastSpokenBallRef = useRef({ innings: null, over: -1, ball: -1 });
+    const previousReactionsRef = useRef({ clap: 0, fire: 0, shock: 0, celebrate: 0 });
+
+    // Load initial TTS state from localStorage and sync ref immediately
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedTts = localStorage.getItem('cricverse-tts-enabled');
+            if (savedTts === 'true') {
+                ttsEnabledRef.current = true;  // sync ref NOW before any poll fires
+                setTtsEnabled(true);
+            }
+        }
+    }, []);
+
+    const toggleTts = () => {
+        // Compute new value directly and update the ref IMMEDIATELY
+        // (don't wait for useEffect — the polling interval may fire before it runs)
+        const newVal = !ttsEnabledRef.current;
+        ttsEnabledRef.current = newVal;
+        setTtsEnabled(newVal);
+
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('cricverse-tts-enabled', String(newVal));
+        }
+
+        if (!newVal) {
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            setIsSpeaking(false);
+        } else {
+            // Speak a short intro to unblock browser autoplay policy via this user gesture.
+            // Without speaking on the click event, Chrome blocks future automated speech.
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                const intro = new SpeechSynthesisUtterance('CricVerse live commentary is now active.');
+                intro.rate = 1.05;
+                window.speechSynthesis.speak(intro);
+            }
+        }
+    };
+
+    const speakCommentary = (text) => {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
+        // Chrome bug: cancel() immediately followed by speak() silently drops the utterance.
+        // We must give Chrome ~150ms to flush its internal queue after cancel().
+        window.speechSynthesis.cancel();
+
+        const doSpeak = () => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => setIsSpeaking(false);
+            utterance.onerror = (e) => {
+                // 'interrupted' errors are expected when we cancel mid-speech — ignore them
+                if (e.error !== 'interrupted') setIsSpeaking(false);
+            };
+            utterance.rate = 1.05;
+
+            // Pick best English voice; voices may not be loaded yet on first call
+            const assignVoiceAndSpeak = () => {
+                const voices = window.speechSynthesis.getVoices();
+                const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+                             || voices.find(v => v.lang.startsWith('en'));
+                if (enVoice) utterance.voice = enVoice;
+                window.speechSynthesis.speak(utterance);
+            };
+
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                assignVoiceAndSpeak();
+            } else {
+                window.speechSynthesis.addEventListener('voiceschanged', assignVoiceAndSpeak, { once: true });
+            }
+        };
+
+        // 150ms buffer to let Chrome fully flush the cancel before speaking
+        setTimeout(doSpeak, 150);
+    };
+
+
+    const generateCommentaryText = (ball, battingTeamName) => {
+        const batsman = ball.batsman || 'The batsman';
+        const bowler = ball.bowler || 'The bowler';
+        const runs = ball.runs;
+        const ballType = ball.ballType || 'legal';
+        const isWicket = ball.isWicket;
+
+        if (isWicket) {
+            return `WICKET! Huge blow for ${battingTeamName}! ${bowler} dismisses ${batsman}! ${batsman} has to walk back.`;
+        }
+
+        if (ballType === 'wide') {
+            return `Wide ball by ${bowler}. Extra run for ${battingTeamName}.`;
+        }
+
+        if (ballType === 'no_ball') {
+            return `No ball by ${bowler}! Free hit! ${batsman} gets ${runs} runs.`;
+        }
+
+        if (runs === 6) {
+            return `SIX! Colossal shot by ${batsman} off ${bowler}! Over the ropes!`;
+        }
+
+        if (runs === 4) {
+            return `FOUR! Beautifully struck by ${batsman} off ${bowler}! To the fence!`;
+        }
+
+        if (runs === 0) {
+            return `${bowler} to ${batsman}, dot ball. Nice delivery.`;
+        }
+
+        return `${bowler} to ${batsman}, ${runs} run${runs > 1 ? 's' : ''} taken. Good running.`;
+    };
+
+    const triggerFloatingEmojis = (emojiArray) => {
+        emojiArray.forEach((emoji, index) => {
+            setTimeout(() => {
+                const id = Math.random().toString(36).substr(2, 9);
+                const left = Math.random() * 80 + 10;
+                setFloatingEmojis(prev => [...prev, { id, emoji, left }]);
+
+                setTimeout(() => {
+                    setFloatingEmojis(prev => prev.filter(item => item.id !== id));
+                }, 3000);
+            }, index * 150);
+        });
+    };
+
+    const sendReaction = async (type) => {
+        const reactionMap = { clap: '👏', fire: '🔥', shock: '😮', celebrate: '🎉' };
+        triggerFloatingEmojis([reactionMap[type]]);
+
+        try {
+            const res = await fetch(`/api/matches/${id}/reaction`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type })
+            });
+            if (res.ok) {
+                const updatedReactions = await res.json();
+                setReactionCounts(updatedReactions);
+                previousReactionsRef.current = { ...updatedReactions };
+            }
+        } catch (err) {
+            console.error('Error posting reaction:', err);
+        }
+    };
+
+    // Safe clipboard helper — falls back to execCommand when document is not focused
+    const copyToClipboard = async (text, successMsg) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast.success(successMsg || 'Copied to clipboard!');
+        } catch {
+            // Fallback: create a hidden textarea, select it, and use deprecated execCommand
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                toast.success(successMsg || 'Copied to clipboard!');
+            } catch {
+                toast.error('Copy failed. Please copy manually.');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+    };
 
     useEffect(() => {
         setIsMounted(true);
         if (!id) return;
-        
+
         const fetchUser = async () => {
             try {
                 const res = await fetch('/api/auth/me');
@@ -43,7 +215,7 @@ export default function MatchDetailsPage() {
                     const data = await res.json();
                     setCurrentUser(data);
                 }
-            } catch (err) {}
+            } catch (err) { }
         };
         fetchUser();
 
@@ -72,8 +244,6 @@ export default function MatchDetailsPage() {
                     bowlingTeam: formatTeam(data.teamB)
                 };
 
-                // Determine batting/bowling based on toss for initial state
-                // This aligns with how the UI expects data (Team 1 vs Team 2)
                 const tossWinner = data.toss?.winner;
                 const decision = data.toss?.decision?.type || data.toss?.decision;
                 const isTeamA = tossWinner === data.teamA.name;
@@ -88,33 +258,101 @@ export default function MatchDetailsPage() {
 
                 setMatchData(formattedMatch);
 
-                // Extract innings data from the now formatted match (or raw data)
-                // Note: The Innings objects in DB have 'battingTeam' string name, which is fine.
-                // But we need the 'firstInningsScore' state to be set.
+                // Set reaction counts state
+                if (data.reactions) {
+                    setReactionCounts(data.reactions);
+
+                    // Compute external reaction changes
+                    const prev = previousReactionsRef.current;
+                    const next = data.reactions;
+                    const reactionMap = { clap: '👏', fire: '🔥', shock: '😮', celebrate: '🎉' };
+                    let diffs = [];
+
+                    Object.keys(reactionMap).forEach(key => {
+                        const countDiff = (next[key] || 0) - (prev[key] || 0);
+                        const triggerCount = Math.min(countDiff, 5); // Cap at 5 emojis per poll
+                        for (let i = 0; i < triggerCount; i++) {
+                            diffs.push(reactionMap[key]);
+                        }
+                    });
+
+                    if (diffs.length > 0) {
+                        triggerFloatingEmojis(diffs);
+                    }
+                    previousReactionsRef.current = { ...next };
+                }
+
+                // Extract innings
+                let activeInnings = null;
+                let activeInningsNum = 0;
+                let battingTeamName = '';
 
                 if (data.innings && data.innings.length > 0) {
                     const firstInnings = data.innings.find(i => i.inningsNumber === 1);
                     if (firstInnings) {
                         setFirstInningsScore({
                             ...firstInnings.score,
+                            status: firstInnings.status,
                             battingTeam: firstInnings.battingTeam,
                             currentPlayers: firstInnings.currentPlayers,
-                            battingStats: firstInnings.battingStats?.map(p => ({ ...p, name: p.playerName })), // Map playerName to name
-                            bowlingStats: firstInnings.bowlingStats?.map(p => ({ ...p, name: p.playerName })), // Map playerName to name
+                            battingStats: firstInnings.battingStats?.map(p => ({ ...p, name: p.playerName })),
+                            bowlingStats: firstInnings.bowlingStats?.map(p => ({ ...p, name: p.playerName })),
                             lastSixBalls: firstInnings.ballHistory?.slice(-6) || []
                         });
+                        if (firstInnings.status !== 'not-started') {
+                            activeInnings = firstInnings;
+                            activeInningsNum = 1;
+                            battingTeamName = firstInnings.battingTeam;
+                        }
                     }
 
                     const secondInnings = data.innings.find(i => i.inningsNumber === 2);
                     if (secondInnings) {
                         setSecondInningsScore({
                             ...secondInnings.score,
+                            status: secondInnings.status,
                             battingTeam: secondInnings.battingTeam,
                             currentPlayers: secondInnings.currentPlayers,
-                            battingStats: secondInnings.battingStats?.map(p => ({ ...p, name: p.playerName })), // Map playerName to name
-                            bowlingStats: secondInnings.bowlingStats?.map(p => ({ ...p, name: p.playerName })), // Map playerName to name
+                            battingStats: secondInnings.battingStats?.map(p => ({ ...p, name: p.playerName })),
+                            bowlingStats: secondInnings.bowlingStats?.map(p => ({ ...p, name: p.playerName })),
                             lastSixBalls: secondInnings.ballHistory?.slice(-6) || []
                         });
+                        if (secondInnings.status !== 'not-started') {
+                            activeInnings = secondInnings;
+                            activeInningsNum = 2;
+                            battingTeamName = secondInnings.battingTeam;
+                        }
+                    }
+                }
+
+                // Evaluate audio commentary
+                if (activeInnings && activeInnings.ballHistory && activeInnings.ballHistory.length > 0) {
+                    const lastBall = activeInnings.ballHistory[activeInnings.ballHistory.length - 1];
+                    const lastSpoken = lastSpokenBallRef.current;
+
+                    const isNewBall = lastSpoken.innings !== activeInningsNum ||
+                                      lastSpoken.over !== lastBall.overNumber ||
+                                      lastSpoken.ball !== lastBall.ballNumber;
+
+                    if (isNewBall) {
+                        if (lastSpoken.over === -1) {
+                            // On first load, initialize ref without speaking
+                            lastSpokenBallRef.current = {
+                                innings: activeInningsNum,
+                                over: lastBall.overNumber,
+                                ball: lastBall.ballNumber
+                            };
+                        } else {
+                            lastSpokenBallRef.current = {
+                                innings: activeInningsNum,
+                                over: lastBall.overNumber,
+                                ball: lastBall.ballNumber
+                            };
+                            const commentaryText = generateCommentaryText(lastBall, battingTeamName);
+                            if (ttsEnabledRef.current) {
+                                speakCommentary(commentaryText);
+                            }
+                        }
                     }
                 }
             } catch (error) {
@@ -123,6 +361,12 @@ export default function MatchDetailsPage() {
         };
 
         fetchMatchDetails();
+
+        const pollInterval = setInterval(() => {
+            fetchMatchDetails();
+        }, 3000);
+
+        return () => clearInterval(pollInterval);
     }, [id]);
 
     if (!isMounted || !matchData) {
@@ -153,7 +397,7 @@ export default function MatchDetailsPage() {
 
         try {
             const element = printRef.current;
-            
+
             // Generate canvas from the print-only wrapper using html-to-image
             // We need to briefly make it visible, but html-to-image doesn't have an `onclone` that works identically 
             // for display:none. So we briefly make it visible on the actual DOM (offscreen) or just unhide it 
@@ -165,26 +409,26 @@ export default function MatchDetailsPage() {
             const originalWidth = element.style.width;
             const originalHeight = element.style.height;
             const originalZIndex = element.style.zIndex;
-            
+
             // Move safely into the viewport so the browser's paint engine doesn't cull it,
             // but keep it visually hidden behind the app background using a negative z-index.
             element.style.setProperty('display', 'block', 'important');
             element.style.position = 'fixed'; // Fixed keeps it strictly in the viewport regardless of scroll
-            element.style.left = '0px'; 
+            element.style.left = '0px';
             element.style.top = '0px';
             element.style.zIndex = '-9999';
             element.style.width = '794px'; // ~A4 width at 96 DPI to prevent squishing
-            
+
             // Force layout flush so width/height are computed before toPng
             const elHeight = element.offsetHeight;
             const elWidth = element.offsetWidth;
-            
+
             // Provide a tiny delay to allow internal lazy-loaded images or styles to settle
             await new Promise(r => setTimeout(r, 150));
 
             // Race condition: Timeout after 8 seconds so user isn't stuck loading forever
             let dataUrl = await Promise.race([
-                toPng(element, { 
+                toPng(element, {
                     quality: 1.0,
                     pixelRatio: 2,
                     backgroundColor: '#ffffff',
@@ -235,7 +479,7 @@ export default function MatchDetailsPage() {
             const pdfWidth = pdf.internal.pageSize.getWidth();
             // Calculate height keeping aspect ratio using true image dimensions
             const imgHeight = (imgProps.h * pdfWidth) / imgProps.w;
-            
+
             pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, imgHeight);
 
             // Get Blob and create File object
@@ -253,8 +497,8 @@ export default function MatchDetailsPage() {
             } else {
                 // Fallback: Download the PDF and copy the link text
                 pdf.save(`CricVerse_${_teamA}_vs_${_teamB}.pdf`);
-                await navigator.clipboard.writeText(`${text}\n\n${url}`);
-                toast.success('PDF Downloaded & link copied to clipboard!', { id: toastId });
+                await copyToClipboard(`${text}\n\n${url}`, 'PDF Downloaded & link copied!');
+                toast.success('PDF Downloaded!', { id: toastId });
             }
         } catch (error) {
             console.error('Error generating or sharing PDF:', error);
@@ -268,70 +512,16 @@ export default function MatchDetailsPage() {
         }
     };
 
-    // AI Feature Handlers
-    const generateCommentary = async () => {
-        if (!id) return;
-        setCommentaryLoading(true);
-        try {
-            const res = await fetch('/api/ai/commentary', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ matchId: id, persona: commentaryPersona }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to generate commentary');
-            setAiCommentary(data.commentary);
-        } catch (err) {
-            toast.error(err.message || 'Failed to generate AI commentary');
-        } finally {
-            setCommentaryLoading(false);
-        }
-    };
 
-    const speakCommentary = (text) => {
-        if (!text || !window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.95;
-        utterance.pitch = 1.1;
-        utterance.onend = () => setIsVoiceActive(false);
-        utterance.onerror = () => setIsVoiceActive(false);
-        setIsVoiceActive(true);
-        window.speechSynthesis.speak(utterance);
-    };
-
-    const stopSpeech = () => {
-        window.speechSynthesis?.cancel();
-        setIsVoiceActive(false);
-    };
-
-    const fetchWinPrediction = async () => {
-        if (!id) return;
-        setWinPredictionLoading(true);
-        try {
-            const res = await fetch('/api/ai/predict-win', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ matchId: id }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to predict');
-            setWinPrediction(data);
-        } catch (err) {
-            toast.error(err.message || 'Failed to get win prediction');
-        } finally {
-            setWinPredictionLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-background">
             {/* ── PRINT-ONLY DOCUMENT ── rendered in DOM, visible only when printing ── */}
             <div ref={printRef} className="print-only" style={{ padding: '14mm 16mm', boxSizing: 'border-box', background: '#ffffff' }}>
-            {/* =========================================================
+                {/* =========================================================
                 PRINT / PDF STYLES  — hidden on screen, active on print
             ========================================================= */}
-            
+
 
                 {/* Branded header */}
                 <div className="print-header">
@@ -476,41 +666,42 @@ export default function MatchDetailsPage() {
             <div className="screen-only max-w-6xl mx-auto pt-2 pb-8 px-4 sm:px-6">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => router.back()}
-                        className="rounded-full no-print"
-                    >
-                        <ChevronLeft className="h-5 w-5" />
-                    </Button>
+                    {!isSpectateMode && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => router.back()}
+                            className="rounded-full no-print"
+                        >
+                            <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                    )}
                     <div className="flex-1">
                         <h1 className="text-2xl sm:text-3xl font-black">Match Details</h1>
                         <p className="text-sm text-muted-foreground">
                             {displayMatchType} • {matchData.totalOvers || matchData.overs || 20} Overs
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleShare}
-                            disabled={isSharing}
-                            className="no-print flex items-center gap-2"
-                        >
-                            <Share2 className="h-4 w-4" />
-                            {isSharing ? 'Generating...' : 'Share PDF'}
-                        </Button>
-                        {/* <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => window.print()}
-                            className="no-print flex items-center gap-2"
-                        >
-                            <Printer className="h-4 w-4" />
-                            Print Summary
-                        </Button> */}
-                    </div>
+                    {!isSpectateMode && (
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleShare}
+                                disabled={isSharing}
+                                className="no-print flex items-center gap-2"
+                            >
+                                <Share2 className="h-4 w-4" />
+                                {isSharing ? 'Generating...' : 'Share PDF'}
+                            </Button>
+                            <ShareCardModal
+                                matchData={matchData}
+                                firstInningsScore={firstInningsScore}
+                                secondInningsScore={secondInningsScore}
+                                isCompleted={isCompleted}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Match Status Banner */}
@@ -539,6 +730,41 @@ export default function MatchDetailsPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        {matchData.shareCode && !isSpectateMode && (
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 mb-2 no-print">
+                                <div className="flex items-center gap-2">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                                    </span>
+                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Live Spectate Code:</span>
+                                    <span className="text-sm font-black text-primary uppercase tracking-widest">{matchData.shareCode}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                            copyToClipboard(matchData.shareCode, 'Spectate code copied to clipboard!');
+                                        }}
+                                        className="h-8 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10"
+                                    >
+                                        Copy Code
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                            const shareUrl = `${window.location.origin}/spectate/${matchData.shareCode}`;
+                                            copyToClipboard(shareUrl, 'Spectate invite link copied to clipboard!');
+                                        }}
+                                        className="h-8 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 border-l border-primary/20 pl-2 rounded-none"
+                                    >
+                                        Copy Invite Link
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="flex items-start gap-3">
                                 <Users className="h-5 w-5 text-muted-foreground mt-0.5" />
@@ -580,6 +806,87 @@ export default function MatchDetailsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Spectator Interactive Suite */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Live Audio Commentary Card */}
+                    <Card className="overflow-hidden border border-primary/20 bg-card/60 backdrop-blur-md">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg font-black flex items-center justify-between">
+                                <span className="flex items-center gap-2">
+                                    🎙️ Live Audio Commentary
+                                </span>
+                                {isSpeaking && ttsEnabled && (
+                                    <div className="commentary-soundwave commentary-soundwave-active" aria-hidden="true">
+                                        <div className="commentary-soundwave-bar"></div>
+                                        <div className="commentary-soundwave-bar"></div>
+                                        <div className="commentary-soundwave-bar"></div>
+                                        <div className="commentary-soundwave-bar"></div>
+                                        <div className="commentary-soundwave-bar"></div>
+                                    </div>
+                                )}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-semibold">Enable Audio Broadcast</p>
+                                    <p className="text-xs text-muted-foreground">Hear ball-by-ball updates read aloud in real-time</p>
+                                </div>
+                                <Button
+                                    variant={ttsEnabled ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={toggleTts}
+                                    className="font-bold shrink-0 animate-pulse"
+                                >
+                                    {ttsEnabled ? 'Speech ON' : 'Speech OFF'}
+                                </Button>
+                            </div>
+                            {ttsEnabled && (
+                                <div className="p-3 bg-muted/40 rounded-lg border text-sm italic text-muted-foreground flex items-center justify-center min-h-[60px] text-center">
+                                    {isSpeaking ? (
+                                        <span className="text-foreground font-medium animate-pulse">
+                                            Reading latest score commentary...
+                                        </span>
+                                    ) : (
+                                        <span>Standing by for next delivery...</span>
+                                    )}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Spectator Live Reactions Card */}
+                    <Card className="overflow-hidden border border-primary/20 bg-card/60 backdrop-blur-md">
+                        <CardHeader className="pb-3">
+                            <CardTitle className="text-lg font-black">
+                                💬 Spectator Gallery Reactions
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <p className="text-xs text-muted-foreground -mt-2">
+                                Cheer for the teams! Tap to send reactions that float up for everyone.
+                            </p>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[
+                                    { type: 'clap', label: '👏 Clap', count: reactionCounts.clap || 0, bg: 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 border-orange-500/20' },
+                                    { type: 'fire', label: '🔥 Fire', count: reactionCounts.fire || 0, bg: 'bg-red-500/10 hover:bg-red-500/20 text-red-500 border-red-500/20' },
+                                    { type: 'shock', label: '😮 Wow', count: reactionCounts.shock || 0, bg: 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 border-blue-500/20' },
+                                    { type: 'celebrate', label: '🎉 Celebration', count: reactionCounts.celebrate || 0, bg: 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 border-purple-500/20' }
+                                ].map((reaction) => (
+                                    <button
+                                        key={reaction.type}
+                                        onClick={() => sendReaction(reaction.type)}
+                                        className={`flex flex-col items-center justify-center p-2 rounded-xl border text-xs font-bold transition-all active:scale-95 ${reaction.bg}`}
+                                    >
+                                        <span className="text-xl mb-1">{reaction.label.split(' ')[0]}</span>
+                                        <span className="font-mono text-xs">{reaction.count}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Scorecard */}
                 <Card className="mb-6">
@@ -672,8 +979,8 @@ export default function MatchDetailsPage() {
                                                         <TableBody>
                                                             {inning.score.battingStats && Object.values(inning.score.battingStats)
                                                                 .filter(batter => batter.balls > 0 || batter.isOut || (inning.score.currentPlayers && (inning.score.currentPlayers.striker?.playerId === batter.playerId || inning.score.currentPlayers.nonStriker?.playerId === batter.playerId))) // Show active batsmen
-                                                                .map((batter) => (
-                                                                    <TableRow key={batter.name}>
+                                                                .map((batter, index) => (
+                                                                    <TableRow key={batter.playerId || batter.name || index}>
                                                                         <TableCell className="font-medium">{batter.name}</TableCell>
                                                                         <TableCell className="text-right font-bold">{batter.runs}</TableCell>
                                                                         <TableCell className="text-right">{batter.balls}</TableCell>
@@ -706,8 +1013,8 @@ export default function MatchDetailsPage() {
                                                         <TableBody>
                                                             {inning.score.bowlingStats && Object.values(inning.score.bowlingStats)
                                                                 .filter(bowler => bowler.overs > 0) // Only show bowlers who have bowled
-                                                                .map((bowler) => (
-                                                                    <TableRow key={bowler.name}>
+                                                                .map((bowler, index) => (
+                                                                    <TableRow key={bowler.playerId || bowler.name || index}>
                                                                         <TableCell className="font-medium">{bowler.name}</TableCell>
                                                                         <TableCell className="text-right">{bowler.overs}</TableCell>
                                                                         <TableCell className="text-right">{bowler.runs}</TableCell>
@@ -794,160 +1101,7 @@ export default function MatchDetailsPage() {
                     </Card>
                 </div>
 
-                {/* ═══════ AI BROADCAST CENTER ═══════ */}
-                {firstInningsScore && (
-                    <div className="mb-6 space-y-4">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                                <Sparkles className="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-black tracking-tight">AI Broadcast Center</h2>
-                                <p className="text-xs text-muted-foreground font-medium">Powered by Google Gemini</p>
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {/* AI Live Commentary Card */}
-                            <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-pink-500/5 overflow-hidden relative">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Mic className="h-5 w-5 text-purple-500" />
-                                        AI Live Commentary
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {/* Persona Selector */}
-                                    <div className="flex gap-2 flex-wrap">
-                                        {[
-                                            { key: 'excited', label: '🔥 Excited', color: 'bg-orange-500/10 border-orange-500/30 text-orange-600 dark:text-orange-400' },
-                                            { key: 'analytical', label: '📊 Analytical', color: 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400' },
-                                            { key: 'sarcastic', label: '🎙️ Witty', color: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400' },
-                                        ].map((p) => (
-                                            <button
-                                                key={p.key}
-                                                onClick={() => setCommentaryPersona(p.key)}
-                                                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-300 ${
-                                                    commentaryPersona === p.key
-                                                        ? `${p.color} ring-2 ring-offset-1 ring-offset-background ring-current scale-105`
-                                                        : 'bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50'
-                                                }`}
-                                            >
-                                                {p.label}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* Generate Button Row */}
-                                    <div className="flex gap-2">
-                                        <Button
-                                            onClick={generateCommentary}
-                                            disabled={commentaryLoading}
-                                            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold shadow-lg shadow-purple-500/25"
-                                            size="sm"
-                                        >
-                                            {commentaryLoading ? (
-                                                <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
-                                            ) : (
-                                                <><Mic className="h-4 w-4 mr-2" /> Generate Commentary</>
-                                            )}
-                                        </Button>
-                                        {aiCommentary && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => isVoiceActive ? stopSpeech() : speakCommentary(aiCommentary)}
-                                                className={`shrink-0 ${isVoiceActive ? 'border-purple-500 text-purple-500 bg-purple-500/10' : ''}`}
-                                            >
-                                                {isVoiceActive ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {/* Commentary Display */}
-                                    {aiCommentary && (
-                                        <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-purple-500/10 relative">
-                                            <div className="absolute top-2 right-2">
-                                                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-500 border-0">
-                                                    {commentaryPersona}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-sm leading-relaxed pr-16 italic text-foreground/90">
-                                                "{aiCommentary}"
-                                            </p>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-
-                            {/* AI Win Predictor Card */}
-                            <Card className="border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-amber-500/5 overflow-hidden relative">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-teal-500 to-amber-500" />
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="flex items-center gap-2 text-lg">
-                                        <Brain className="h-5 w-5 text-cyan-500" />
-                                        AI Win Predictor
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <Button
-                                        onClick={fetchWinPrediction}
-                                        disabled={winPredictionLoading}
-                                        className="w-full bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700 text-white font-bold shadow-lg shadow-cyan-500/25"
-                                        size="sm"
-                                    >
-                                        {winPredictionLoading ? (
-                                            <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing...</>
-                                        ) : (
-                                            <><Brain className="h-4 w-4 mr-2" /> Predict Winner</>
-                                        )}
-                                    </Button>
-
-                                    {winPrediction && (
-                                        <div className="space-y-3">
-                                            {/* Team Names */}
-                                            <div className="flex justify-between items-center text-sm font-bold">
-                                                <span className="text-cyan-500">{winPrediction.teamA.name}</span>
-                                                <span className="text-amber-500">{winPrediction.teamB.name}</span>
-                                            </div>
-
-                                            {/* Probability Bar */}
-                                            <div className="relative h-8 rounded-full overflow-hidden bg-muted/30 border border-border/50">
-                                                <div
-                                                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all duration-1000 ease-out rounded-l-full"
-                                                    style={{ width: `${winPrediction.teamA.probability}%` }}
-                                                />
-                                                <div
-                                                    className="absolute inset-y-0 right-0 bg-gradient-to-l from-amber-500 to-amber-400 transition-all duration-1000 ease-out rounded-r-full"
-                                                    style={{ width: `${winPrediction.teamB.probability}%` }}
-                                                />
-                                                <div className="absolute inset-0 flex items-center justify-between px-3">
-                                                    <span className="text-xs font-black text-white drop-shadow-md">{winPrediction.teamA.probability}%</span>
-                                                    <span className="text-xs font-black text-white drop-shadow-md">{winPrediction.teamB.probability}%</span>
-                                                </div>
-                                            </div>
-
-                                            {/* AI Insight */}
-                                            {winPrediction.insight && (
-                                                <div className="bg-background/60 backdrop-blur-sm rounded-xl p-3 border border-cyan-500/10">
-                                                    <p className="text-xs leading-relaxed text-foreground/80">
-                                                        <span className="font-bold text-cyan-500">💡 AI Insight:</span>{' '}
-                                                        {winPrediction.insight}
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                                                Phase: {winPrediction.phase?.replace('-', ' ')}
-                                            </Badge>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                )}
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 no-print">
@@ -964,8 +1118,12 @@ export default function MatchDetailsPage() {
                                         router.push(`/matches/${id}/start-innings`);
                                     }
                                 }
+                                // If first innings is in progress, continue scoring first innings
+                                else if (firstInningsScore && firstInningsScore.status !== 'completed') {
+                                    router.push(`/matches/${id}/score?innings=1`);
+                                }
                                 // If first innings is complete but second hasn't started, go to player selection for second innings
-                                else if (firstInningsScore && !secondInningsScore) {
+                                else if (firstInningsScore && firstInningsScore.status === 'completed' && !secondInningsScore) {
                                     router.push(`/matches/${id}/start-innings?innings=2`);
                                 }
                                 // If second innings has started, continue scoring
@@ -974,18 +1132,31 @@ export default function MatchDetailsPage() {
                                 }
                             }}
                         >
-                            {secondInningsScore ? 'Continue Match' : firstInningsScore ? 'Start Second Innings' : 'Start Match'}
+                            {secondInningsScore || (firstInningsScore && firstInningsScore.status !== 'completed') ? 'Continue Match' : firstInningsScore ? 'Start Second Innings' : 'Start Match'}
                         </Button>
                     )}
-                    <Button
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => matchData.tournamentId ? router.push(`/tournaments/${matchData.tournamentId}`) : router.push('/matches')}
-                    >
-                        {matchData.tournamentId ? 'Back to Tournament' : 'Back to Matches'}
-                    </Button>
+                    {!isSpectateMode && (
+                        <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => matchData.tournamentId ? router.push(`/tournaments/${matchData.tournamentId}`) : router.push('/matches')}
+                        >
+                            {matchData.tournamentId ? 'Back to Tournament' : 'Back to Matches'}
+                        </Button>
+                    )}
                 </div>
             </div>
+            
+            {/* Floating Emojis Portal */}
+            {floatingEmojis.map(item => (
+                <div
+                    key={item.id}
+                    className="floating-reaction-emoji"
+                    style={{ left: `${item.left}%` }}
+                >
+                    {item.emoji}
+                </div>
+            ))}
         </div>
     );
 }
