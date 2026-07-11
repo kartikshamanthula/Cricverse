@@ -8,12 +8,54 @@ import { getServerSession } from '@/lib/auth';
 export async function GET(request) {
     try {
         await connectToDatabase();
+
+        const { searchParams } = new URL(request.url);
+        const shareCode = searchParams.get('shareCode');
+
+        if (shareCode) {
+            const match = await Match.findOne({ shareCode: shareCode.trim().toUpperCase() });
+            if (!match) {
+                return NextResponse.json({ error: 'Match not found for this code' }, { status: 404 });
+            }
+            // Only expire when status is explicitly 'completed'
+            // Note: match.result is always a truthy Mongoose subdocument even when empty, so do NOT use it as the condition
+            if (match.status === 'completed') {
+                return NextResponse.json({ error: 'This spectating link has expired because the match is complete' }, { status: 410 });
+            }
+            return NextResponse.json(match);
+        }
+
+        // Populate shareCode for legacy matches lacking it
+        const matchesWithoutCode = await Match.find({ 
+            $or: [
+                { shareCode: { $exists: false } },
+                { shareCode: null },
+                { shareCode: "" }
+            ]
+        });
+        if (matchesWithoutCode.length > 0) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (const m of matchesWithoutCode) {
+                let unique = false;
+                let code = '';
+                while (!unique) {
+                    let tempCode = '';
+                    for (let i = 0; i < 8; i++) {
+                        tempCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    code = `CV-${tempCode}`;
+                    const existing = await Match.findOne({ shareCode: code });
+                    if (!existing) unique = true;
+                }
+                await Match.updateOne({ _id: m._id }, { $set: { shareCode: code } });
+            }
+        }
+
         const session = await getServerSession();
         if (!session) {
             return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { searchParams } = new URL(request.url);
         const status = searchParams.get('status');
         const tournamentId = searchParams.get('tournamentId');
         const fetchAll = searchParams.get('all') === 'true';

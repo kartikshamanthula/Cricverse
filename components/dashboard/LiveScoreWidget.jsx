@@ -2,9 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Calendar, RefreshCw, Swords, ChevronRight, Wrench } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, Swords, ChevronRight, Wrench, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -558,7 +560,56 @@ function SkeletonCard() {
 
 export function LiveScoreWidget() {
     const { user } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [spectateCode, setSpectateCode] = useState('');
+    const [spectating, setSpectating] = useState(false);
     const [data, setData] = useState({ live: [], played: [], upcoming: [] });
+
+    // Handle auto-spectating if 'spectate' query parameter is present
+    useEffect(() => {
+        const spectateParam = searchParams.get('spectate');
+        if (spectateParam) {
+            setSpectateCode(spectateParam);
+            const autoSpectate = async () => {
+                const toastId = toast.loading(`Auto-spectating match code: ${spectateParam}...`);
+                try {
+                    const res = await fetch(`/api/matches?shareCode=${spectateParam.trim().toUpperCase()}`);
+                    if (!res.ok) {
+                        throw new Error('Match code not found or invalid');
+                    }
+                    const match = await res.json();
+                    toast.success('Match found! Redirecting...', { id: toastId });
+                    router.push(`/matches/${match._id}`);
+                } catch (err) {
+                    console.error(err);
+                    toast.error(err.message || 'Failed to spectate match.', { id: toastId });
+                }
+            };
+            autoSpectate();
+        }
+    }, [searchParams, router]);
+
+    const handleSpectate = async (e) => {
+        e.preventDefault();
+        if (!spectateCode.trim()) return;
+        setSpectating(true);
+        const toastId = toast.loading('Searching for match code...');
+        try {
+            const res = await fetch(`/api/matches?shareCode=${spectateCode.trim().toUpperCase()}`);
+            if (!res.ok) {
+                throw new Error('Match code not found or invalid');
+            }
+            const match = await res.json();
+            toast.success('Match found! Redirecting...', { id: toastId });
+            router.push(`/matches/${match._id}`);
+        } catch (err) {
+            console.error(err);
+            toast.error(err.message || 'Failed to spectate match.', { id: toastId });
+        } finally {
+            setSpectating(false);
+        }
+    };
     const [myMatches, setMyMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [myLoading, setMyLoading] = useState(true);
@@ -738,6 +789,7 @@ export function LiveScoreWidget() {
                     </button>
                 </div>
             </div>
+
 
             {/* ── Level 2: Status Sub-tabs & (Optional) Formats ── */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 bg-muted/20 px-4 py-3 rounded-xl border border-border/40">

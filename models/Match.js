@@ -104,6 +104,11 @@ const MatchSchema = new mongoose.Schema(
             unique: true,
             required: true,
         },
+        shareCode: {
+            type: String,
+            unique: true,
+            sparse: true,
+        },
         teamA: TeamRefSchema,
         teamB: TeamRefSchema,
         venue: {
@@ -171,6 +176,12 @@ const MatchSchema = new mongoose.Schema(
             },
         },
         innings: [InningsSchema],
+        reactions: {
+            clap: { type: Number, default: 0 },
+            fire: { type: Number, default: 0 },
+            shock: { type: Number, default: 0 },
+            celebrate: { type: Number, default: 0 }
+        },
         tournamentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Tournament',
@@ -178,7 +189,7 @@ const MatchSchema = new mongoose.Schema(
         },
         tournamentName: String,
         createdBy: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.Mixed,
             ref: 'User',
             required: true,
         },
@@ -189,19 +200,35 @@ const MatchSchema = new mongoose.Schema(
 );
 
 // Indexes
-MatchSchema.index({ matchNumber: 1 });
 MatchSchema.index({ 'teamA.teamId': 1, matchDate: -1 });
 MatchSchema.index({ 'teamB.teamId': 1, matchDate: -1 });
 MatchSchema.index({ tournamentId: 1, matchDate: -1 });
 MatchSchema.index({ status: 1, matchDate: -1 });
 MatchSchema.index({ matchDate: -1 });
 
-// Pre-save hook to generate match number
+// Pre-save hook to generate match number and share code
 MatchSchema.pre('save', async function () {
     if (!this.matchNumber) {
         const year = new Date().getFullYear();
         const count = await mongoose.models.Match.countDocuments();
         this.matchNumber = `M-${year}-${String(count + 1).padStart(4, '0')}`;
+    }
+
+    if (!this.shareCode) {
+        let unique = false;
+        let code = '';
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        while (!unique) {
+            let tempCode = '';
+            for (let i = 0; i < 8; i++) {
+                tempCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            code = `CV-${tempCode}`;
+            const MatchModel = this.constructor;
+            const existing = await MatchModel.findOne({ shareCode: code });
+            if (!existing) unique = true;
+        }
+        this.shareCode = code;
     }
 });
 
@@ -229,4 +256,7 @@ MatchSchema.methods.updateScore = function (inningsNumber, scoreUpdate) {
     throw new Error('Innings not found');
 };
 
-export default mongoose.models.Match || mongoose.model('Match', MatchSchema);
+if (mongoose.models.Match) {
+    delete mongoose.models.Match;
+}
+export default mongoose.model('Match', MatchSchema);

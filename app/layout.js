@@ -11,7 +11,7 @@ import { CheckoutModal } from "@/components/cart/CheckoutModal";
 import "./globals.css";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AccessDenied } from "@/components/layout/AccessDenied";
 
 const MainLayout = ({ children }) => {
@@ -19,6 +19,7 @@ const MainLayout = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useAuth();
+  const isSpectateMode = typeof window !== "undefined" && (window.location.search.includes("spectate=true") || pathname.startsWith("/spectate/"));
   
   const isAuthPage = pathname === "/login" || pathname === "/register";
   const isLandingPage = pathname === "/";
@@ -55,8 +56,8 @@ const MainLayout = ({ children }) => {
     }
   }, [user, loading, pathname, router]);
 
-  // Don't render header/footer/sidebar for auth pages, unauthenticated landing page, or the store
-  if (isAuthPage || isLandingPage || isStorePage) {
+  // Don't render header/footer/sidebar for auth pages, unauthenticated landing page, store page, or spectate modes
+  if (isAuthPage || isLandingPage || isStorePage || isSpectateMode || !user) {
     if (isStorePage && isBlocked) {
       return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
@@ -66,7 +67,9 @@ const MainLayout = ({ children }) => {
     }
     return (
       <>
-        {children}
+        <div className={(isSpectateMode || !user) && pathname.startsWith("/matches/") ? "p-4 sm:p-6 max-w-7xl mx-auto w-full" : ""}>
+          {children}
+        </div>
         <CartSidebar />
         <CheckoutModal
           isOpen={isCheckoutOpen}

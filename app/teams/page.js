@@ -58,6 +58,8 @@ function TeamsPage() {
             setError(null);
 
             const response = await fetch('/api/teams');
+            if (response.status === 401) return; // Silently ignore on logout
+            
             const data = await response.json();
 
             if (!response.ok) {

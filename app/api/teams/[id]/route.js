@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
         }
 
         const { id } = await params;
-        const team = await Team.findOne({ _id: id, createdBy: session.id });
+        const team = await Team.findOne({ _id: id, createdBy: session.id }).populate('players');
 
         if (!team) {
             return NextResponse.json(
@@ -77,7 +77,7 @@ export async function PUT(request, { params }) {
                 returnDocument: 'after',
                 runValidators: true,
             }
-        );
+        ).populate('players');
 
         if (!team) {
             return NextResponse.json(

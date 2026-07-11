@@ -202,6 +202,7 @@ export default function MatchesPage() {
         setIsLoading(true);
         try {
             const res = await fetch('/api/matches');
+            if (res.status === 401) return; // Silently ignore on logout
             if (!res.ok) throw new Error('Failed to fetch matches');
             const data = await res.json();
             setMatches(data);
