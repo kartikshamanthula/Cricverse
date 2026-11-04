@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Search, Bell, ShoppingCart, LogOut, UserCircle, Sun, Moon, Home, Users, Trophy, PenTool, ClipboardList, ShoppingBag, ChevronDown, Package } from 'lucide-react';
+import { Search, Bell, ShoppingCart, LogOut, UserCircle, Sun, Moon, Home, Users, Trophy, PenTool, ClipboardList, ShoppingBag, ChevronDown, Package, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -124,6 +124,12 @@ export function Header() {
                                         </Button>
                                     </Link>
                                 )}
+                                <Link href="/grounds">
+                                    <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:scale-105">
+                                        <MapPin className="h-4 w-4 text-emerald-500" />
+                                        <span>Cricket Turfs</span>
+                                    </Button>
+                                </Link>
                             </>
                         ) : (
                             <>
