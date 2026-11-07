@@ -513,12 +513,12 @@ export function LandingHero() {
                         </Link>
                     ) : (
                         <>
-                            <Link href="/login">
+                            <Link href="/login" replace>
                                 <Button variant="ghost" className="hidden sm:flex font-semibold hover:bg-primary/10">
                                     <LogIn className="mr-2 h-4 w-4" /> Login
                                 </Button>
                             </Link>
-                            <Link href="/register">
+                            <Link href="/register" replace>
                                 <Button className="font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-105 transition-all bg-gradient-to-r from-primary to-blue-600 hover:from-primary hover:to-blue-500">
                                     <UserPlus className="mr-2 h-4 w-4 hidden sm:block" /> Register
                                 </Button>
@@ -592,13 +592,13 @@ export function LandingHero() {
                                 </Link>
                             ) : (
                                 <>
-                                    <Link href="/register" className="w-full sm:w-auto">
+                                    <Link href="/register" replace className="w-full sm:w-auto">
                                         <Button size="lg" className="relative group h-14 px-10 text-lg font-bold shadow-[0_0_40px_-10px_rgba(34,197,94,0.5)] overflow-hidden rounded-full w-full sm:w-auto transition-all hover:scale-105 hover:shadow-[0_0_60px_-15px_rgba(34,197,94,0.7)] bg-primary border-none">
                                             <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-500 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                             <span className="relative z-10 flex items-center justify-center">Get Started for Free <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" /></span>
                                         </Button>
                                     </Link>
-                                    <Link href="/login" className="w-full sm:w-auto">
+                                    <Link href="/login" replace className="w-full sm:w-auto">
                                         <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold hover:scale-105 transition-transform w-full sm:w-auto rounded-full border-2 bg-background/50 backdrop-blur-sm">
                                             Sign In
                                         </Button>
@@ -919,7 +919,7 @@ export function LandingHero() {
                                 </Button>
                             </Link>
                         ) : (
-                            <Link href="/register">
+                            <Link href="/register" replace>
                                 <Button size="lg" className="w-full h-16 text-xl font-bold shadow-2xl shadow-primary/30 hover:scale-105 transition-transform rounded-full bg-gradient-to-r from-primary to-blue-600 border-none select-none">
                                     Create Free Account <ArrowRight className="ml-2 w-6 h-6" />
                                 </Button>

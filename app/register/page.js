@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
@@ -13,9 +13,28 @@ import Link from "next/link"
 export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
+    const { user, loading: authLoading } = useAuth()
     const router = useRouter()
 
     const [regForm, setRegForm] = useState({ username: "", name: "", password: "", confirm: "" })
+
+    // Redirect already authenticated users away from /register
+    useEffect(() => {
+        if (!authLoading && user && typeof window !== "undefined") {
+            window.location.replace(user.role === "admin" ? "/admin/products" : "/dashboard")
+        }
+    }, [user, authLoading])
+
+    // Detect browser Back-Forward Cache (bfcache) restoration and force fresh state
+    useEffect(() => {
+        const handlePageShow = (event) => {
+            if (event.persisted) {
+                window.location.reload()
+            }
+        }
+        window.addEventListener("pageshow", handlePageShow)
+        return () => window.removeEventListener("pageshow", handlePageShow)
+    }, [])
 
     const handleRegister = async (e) => {
         e.preventDefault()
@@ -37,7 +56,7 @@ export default function RegisterPage() {
             await fetch("/api/auth/logout", { method: "POST" })
 
             toast.success("Account created!", { description: "Please log in with your new credentials." })
-            router.push("/login")
+            window.location.replace("/login")
         } catch (err) {
             toast.error("Registration failed", { description: err.message })
         } finally {
@@ -60,6 +79,10 @@ export default function RegisterPage() {
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    }
+
+    if (authLoading || user) {
+        return null
     }
 
     return (

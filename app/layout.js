@@ -37,6 +37,27 @@ const MainLayout = ({ children }) => {
   const requiredPerm = getRequiredPermission(pathname);
   const isBlocked = user && user.role !== "admin" && requiredPerm && user.permissions?.[requiredPerm] === false;
 
+  // If user is already authenticated and lands on /login or /register, immediately replace with dashboard
+  useEffect(() => {
+    if (!loading && user && isAuthPage && typeof window !== "undefined") {
+      window.location.replace(user.role === "admin" ? "/admin/products" : "/dashboard");
+    }
+  }, [user, loading, isAuthPage]);
+
+  // Lock browser backward navigation on root dashboard so clicking Back cannot navigate back to login
+  useEffect(() => {
+    if (!loading && user && typeof window !== "undefined") {
+      if (pathname === "/dashboard" || pathname === "/admin/products") {
+        window.history.pushState(null, "", window.location.href);
+        const handlePopState = () => {
+          window.history.pushState(null, "", window.location.href);
+        };
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+      }
+    }
+  }, [user, loading, pathname]);
+
   // Single-Module Auto-Redirection
   useEffect(() => {
     if (!loading && user && user.role !== "admin" && user.permissions) {
@@ -55,6 +76,11 @@ const MainLayout = ({ children }) => {
       }
     }
   }, [user, loading, pathname, router]);
+
+  // If user is already logged in and attempts to view an auth page, render nothing while redirecting
+  if (!loading && user && isAuthPage) {
+    return null;
+  }
 
   // Don't render header/footer/sidebar for auth pages, unauthenticated landing page, store page, or spectate modes
   if (isAuthPage || isLandingPage || isStorePage || isSpectateMode || !user) {
