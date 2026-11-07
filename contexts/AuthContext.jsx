@@ -53,7 +53,11 @@ export function AuthProvider({ children }) {
         await fetch("/api/auth/logout", { method: "POST" })
         setUser(null)
         toast.success("Logged out successfully.")
-        router.push("/login")
+        if (typeof window !== "undefined") {
+            window.location.replace("/login")
+        } else {
+            router.replace("/login")
+        }
     }
 
     return (

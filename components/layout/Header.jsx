@@ -237,7 +237,7 @@ export function Header() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
-                            <Link href="/login">
+                            <Link href="/login" replace>
                                 <Button variant="outline" size="sm" className="gap-2">
                                     <UserCircle className="h-4 w-4" /> Login
                                 </Button>

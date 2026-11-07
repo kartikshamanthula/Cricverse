@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
@@ -13,10 +13,28 @@ import Link from "next/link"
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
-    const { login } = useAuth()
+    const { login, user, loading: authLoading } = useAuth()
     const router = useRouter()
 
     const [loginForm, setLoginForm] = useState({ username: "", password: "" })
+
+    // Redirect already authenticated users away from /login
+    useEffect(() => {
+        if (!authLoading && user && typeof window !== "undefined") {
+            window.location.replace(user.role === "admin" ? "/admin/products" : "/dashboard")
+        }
+    }, [user, authLoading])
+
+    // Detect browser Back-Forward Cache (bfcache) restoration and force fresh state
+    useEffect(() => {
+        const handlePageShow = (event) => {
+            if (event.persisted) {
+                window.location.reload()
+            }
+        }
+        window.addEventListener("pageshow", handlePageShow)
+        return () => window.removeEventListener("pageshow", handlePageShow)
+    }, [])
 
     const handleLogin = async (e) => {
         e.preventDefault()
@@ -24,8 +42,8 @@ export default function LoginPage() {
         try {
             const me = await login(loginForm.username, loginForm.password)
             toast.success("Welcome back!", { description: `Logged in as ${me.name}` })
-            if (me.role === "admin") router.push("/admin/products")
-            else router.push("/dashboard")
+            const destination = me.role === "admin" ? "/admin/products" : "/dashboard"
+            window.location.replace(destination)
         } catch (err) {
             const errorMessage = err.message || "An unknown error occurred"
 
@@ -57,6 +75,10 @@ export default function LoginPage() {
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    }
+
+    if (authLoading || user) {
+        return null
     }
 
     return (
