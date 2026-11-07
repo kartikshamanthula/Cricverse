@@ -6,6 +6,12 @@ const secret = new TextEncoder().encode(JWT_SECRET);
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;
+
+    // 0. The root landing page is always 100% public — never redirect or block '/'
+    if (pathname === '/') {
+        return NextResponse.next();
+    }
+
     const token = request.cookies.get('cv_token')?.value;
 
     let isAuthenticated = false;
@@ -61,15 +67,16 @@ export async function middleware(request) {
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - static image/asset extensions
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:jpg|jpeg|gif|png|svg|ico|webp)$).*)',
+        '/login',
+        '/register',
+        '/dashboard',
+        '/dashboard/:path*',
+        '/admin/:path*',
+        '/profile',
+        '/orders',
+        '/teams/:path*',
+        '/tournaments/create',
+        '/matches/create',
     ],
 };
 
