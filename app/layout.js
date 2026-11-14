@@ -151,7 +151,14 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                const theme = localStorage.getItem('cricverse-theme') || 'dark';
+                let theme = localStorage.getItem('cricverse-theme');
+                if (!localStorage.getItem('cricverse-theme-v2')) {
+                  theme = 'light';
+                  localStorage.setItem('cricverse-theme', 'light');
+                  localStorage.setItem('cricverse-theme-v2', 'true');
+                }
+                theme = theme || 'light';
+                document.documentElement.classList.remove('dark', 'light');
                 document.documentElement.classList.add(theme);
               } catch (e) {}
             `,

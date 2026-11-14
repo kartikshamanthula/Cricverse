@@ -18,8 +18,6 @@ import {
     Activity,
     ArrowRight,
     Sparkles,
-    ShoppingBag,
-    MapPin,
     ChevronDown,
     ChevronRight,
     CheckCircle2,
@@ -79,7 +77,9 @@ export function LandingHero() {
                 "Downloadable official PDF match scorecards with 1-click"
             ],
             badge: "Core Engine",
-            gradient: "from-green-600/15 to-green-600/5"
+            gradient: "from-green-600/15 to-green-600/5",
+            ctaLoggedOut: { label: "Try Scoring Console Free", href: "/register" },
+            ctaLoggedIn: { label: "Start Live Match Scoring", href: "/matches/create" }
         },
         {
             id: "spectate",
@@ -94,13 +94,15 @@ export function LandingHero() {
                 "Completely mobile responsive for fans on the go"
             ],
             badge: "Fan Engagement",
-            gradient: "from-blue-600/15 to-blue-600/5"
+            gradient: "from-blue-600/15 to-blue-600/5",
+            ctaLoggedOut: { label: "Try Magic Links Free", href: "/register" },
+            ctaLoggedIn: { label: "Explore Live Matches", href: "/matches" }
         },
         {
             id: "tournaments",
             label: "Leagues & Tournaments",
             icon: Trophy,
-            title: "Complete Tournament Management OS",
+            title: "Complete Tournament Management",
             desc: "Organize neighborhood cups, corporate box cricket tournaments, and competitive regional leagues with fully automated brackets and points tables.",
             bullets: [
                 "Knockout, League, and Round-Robin tournament formats",
@@ -109,37 +111,9 @@ export function LandingHero() {
                 "Tournament match scheduling with stage tracking"
             ],
             badge: "Organizer Hub",
-            gradient: "from-orange-600/15 to-orange-600/5"
-        },
-        {
-            id: "turf",
-            label: "Turf & Ground Booking",
-            icon: MapPin,
-            title: "Box Cricket & Turf Booking in Surat",
-            desc: "Discover and reserve top turf grounds across Surat neighborhoods like Vesu, Adajan, Varachha, VIP Road, and Piplod with verified time slots and transparent hourly rates.",
-            bullets: [
-                "Detailed amenities list: floodlights, turf matting, parking, nets",
-                "Peak & non-peak dynamic pricing with instant cart add",
-                "Interactive location map & manager direct contact",
-                "Box cricket and full match ground categorizations"
-            ],
-            badge: "Surat Venues",
-            gradient: "from-green-600/15 to-green-600/5"
-        },
-        {
-            id: "store",
-            label: "Official Equipment Store",
-            icon: ShoppingBag,
-            title: "Premium Cricket Gear & Apparel",
-            desc: "Direct access to top-grade English and Kashmir willow bats, leather match balls, batting pads, wicket-keeping gloves, and breathable team kits.",
-            bullets: [
-                "Curated equipment categories with real-time stock levels",
-                "Integrated shopping bag with instant checkout modal",
-                "Order status tracker (Processing, Shipped, Delivered)",
-                "Quality tested for box turf and leather tournament play"
-            ],
-            badge: "Cricket Shop",
-            gradient: "from-purple-600/15 to-purple-600/5"
+            gradient: "from-orange-600/15 to-orange-600/5",
+            ctaLoggedOut: { label: "Create Your First League", href: "/register" },
+            ctaLoggedIn: { label: "Create Tournament", href: "/tournaments/create" }
         }
     ];
 
@@ -159,10 +133,6 @@ export function LandingHero() {
         {
             q: "How does CricVerse calculate Tournament Points & Net Run Rate (NRR)?",
             a: "Whenever a tournament match is completed, CricVerse's points engine instantly updates total runs scored, overs faced, runs conceded, and overs bowled for both sides, calculating exact Net Run Rate down to 3 decimal places."
-        },
-        {
-            q: "Can I book Box Cricket turfs directly in Surat?",
-            a: "Yes! The Grounds module features prime box cricket arenas and practice nets across Surat (Vesu, Adajan, Varachha, Piplod, VIP Road, etc.) with slot availability, pricing, and 1-click cart reservation."
         }
     ];
 
@@ -191,7 +161,7 @@ export function LandingHero() {
                                 </svg>
                             </div>
                         </div>
-                        <span className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-primary">
+                        <span className="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-linear-to-r from-foreground via-foreground to-primary">
                             CricVerse
                         </span>
                     </Link>
@@ -200,10 +170,6 @@ export function LandingHero() {
                     <nav className="hidden lg:flex items-center gap-8 text-sm font-semibold text-muted-foreground">
                         <a href="#features" className="hover:text-primary transition-colors">Features</a>
                         <a href="#how-it-works" className="hover:text-primary transition-colors">How It Works</a>
-                        <Link href="/grounds" className="hover:text-primary transition-colors flex items-center gap-1">
-                            Turf Grounds <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-bold">Surat</span>
-                        </Link>
-                        <Link href="/store" className="hover:text-primary transition-colors">Store</Link>
                         <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
                     </nav>
 
@@ -226,14 +192,14 @@ export function LandingHero() {
                             </Link>
                         ) : (
                             <>
-                                <Link href="/login" replace className="hidden sm:inline-flex">
+                                <Link href="/login" className="hidden sm:inline-flex">
                                     <Button variant="ghost" className="font-bold text-sm rounded-xl">
                                         Sign In
                                     </Button>
                                 </Link>
-                                <Link href="/register" replace>
+                                <Link href="/register">
                                     <Button className="font-bold text-sm shadow-md bg-green-600 hover:bg-green-700 text-white rounded-xl">
-                                        Get Started Free
+                                        Get Started Now
                                     </Button>
                                 </Link>
                             </>
@@ -260,19 +226,17 @@ export function LandingHero() {
                         <nav className="flex flex-col gap-3 font-semibold text-base">
                             <a href="#features" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">Features</a>
                             <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">How It Works</a>
-                            <Link href="/grounds" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary flex items-center justify-between">
-                                Turf Booking (Surat) <Badge className="bg-primary/20 text-primary">New</Badge>
-                            </Link>
-                            <Link href="/store" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">Cricket Store</Link>
+                            <Link href="/matches" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">Live Matches</Link>
+                            <Link href="/tournaments" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">Tournaments</Link>
                             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="py-2 hover:text-primary">FAQ</a>
                         </nav>
                         {!user && (
                             <div className="pt-4 border-t border-border flex flex-col gap-2.5">
-                                <Link href="/login" replace onClick={() => setMobileMenuOpen(false)}>
+                                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                                     <Button variant="outline" className="w-full font-bold">Sign In</Button>
                                 </Link>
-                                <Link href="/register" replace onClick={() => setMobileMenuOpen(false)}>
-                                    <Button className="w-full font-bold bg-green-600 hover:bg-green-700 text-white">Get Started Free</Button>
+                                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                                    <Button className="w-full font-bold bg-green-600 hover:bg-green-700 text-white">Get Started Now</Button>
                                 </Link>
                             </div>
                         )}
@@ -292,7 +256,7 @@ export function LandingHero() {
                     >
                         <Sparkles className="h-4 w-4 text-green-600" />
                         <span className="text-xs sm:text-sm font-bold text-foreground">
-                            CricVerse 2.0 • Live Commentary • Box Turf Booking • Magic Links
+                            CricVerse 2.0 • Live Commentary • Tournaments • Magic Links
                         </span>
                     </motion.div>
 
@@ -303,10 +267,7 @@ export function LandingHero() {
                         transition={{ duration: 0.7, delay: 0.1 }}
                         className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]"
                     >
-                        The Operating System for <br className="hidden sm:inline" />
-                        <span className="text-green-600 drop-shadow-sm">
-                            Modern Cricket.
-                        </span>
+                        The Modern Cricket Platform <br className="hidden sm:inline" />
                     </motion.h1>
 
                     {/* Subtitle */}
@@ -316,7 +277,7 @@ export function LandingHero() {
                         transition={{ duration: 0.7, delay: 0.2 }}
                         className="text-base sm:text-xl text-muted-foreground font-normal max-w-2xl mx-auto leading-relaxed"
                     >
-                        From box turf gully matches to full 20-over championship leagues. Real-time ball-by-ball scoring, live voice commentary, spectator magic links, and local ground bookings.
+                        From friendly gully matches to full 20-over championship leagues. Real-time ball-by-ball scoring, live voice commentary, magic links to see scoring, and automated tournament standings.
                     </motion.p>
 
                     {/* CTA Button Group */}
@@ -333,15 +294,15 @@ export function LandingHero() {
                                 </Button>
                             </Link>
                         ) : (
-                            <Link href="/register" replace className="w-full sm:w-auto">
+                            <Link href="/register" className="w-full sm:w-auto">
                                 <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base font-bold rounded-2xl bg-green-600 hover:bg-green-700 text-white shadow-lg hover:scale-105 transition-all">
-                                    Start Scoring Free <ArrowRight className="ml-2 h-5 w-5" />
+                                    Start Scoring Now <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
                         )}
-                        <Link href="/grounds" className="w-full sm:w-auto">
+                        <Link href="/login" className="w-full sm:w-auto">
                             <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base font-bold rounded-2xl border-2 border-green-600 text-green-700 hover:bg-green-50 dark:hover:bg-green-950/30 dark:text-green-500 dark:border-green-600 transition-all">
-                                <MapPin className="mr-2 h-5 w-5" /> Book Turf Grounds
+                                Explore Live Matches <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                         </Link>
                     </motion.div>
@@ -378,10 +339,10 @@ export function LandingHero() {
                         </div>
                         <div className="space-y-1">
                             <div className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
-                                <AnimatedCounter value={42} />
+                                <AnimatedCounter value={2850} />+
                             </div>
                             <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                                Surat Turfs Verified
+                                Matches Scored
                             </p>
                         </div>
                     </div>
@@ -398,7 +359,7 @@ export function LandingHero() {
                         Everything You Need to Run Cricket Like a Pro.
                     </h2>
                     <p className="text-muted-foreground text-base sm:text-lg">
-                        Built from the ground up for grassroots players, turf tournament organizers, and avid cricket fans.
+                        Built from the ground up for grassroots players, tournament organizers, and cricket fans.
                     </p>
                 </div>
 
@@ -430,7 +391,7 @@ export function LandingHero() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
-                    className={`rounded-3xl border border-border/60 bg-gradient-to-br ${currentTab.gradient} p-8 sm:p-12 shadow-2xl relative overflow-hidden`}
+                    className={`rounded-3xl border border-border/60 bg-linear-to-br ${currentTab.gradient} p-8 sm:p-12 shadow-2xl relative overflow-hidden`}
                 >
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                         <div className="lg:col-span-7 space-y-6">
@@ -454,32 +415,22 @@ export function LandingHero() {
                             </ul>
 
                             <div className="pt-4 flex flex-wrap gap-4">
-                                {currentTab.id === "turf" ? (
-                                    <Link href="/grounds">
-                                        <Button className="font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white">
-                                            Explore Surat Turfs <ChevronRight className="ml-1 h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                ) : currentTab.id === "store" ? (
-                                    <Link href="/store">
-                                        <Button className="font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white">
-                                            Visit Equipment Store <ChevronRight className="ml-1 h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                ) : (
-                                    <Link href="/register" replace>
-                                        <Button className="font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white">
-                                            Try This Feature Free <ChevronRight className="ml-1 h-4 w-4" />
-                                        </Button>
-                                    </Link>
-                                )}
+                                <Link href={user ? (currentTab.ctaLoggedIn?.href || "/dashboard") : (currentTab.ctaLoggedOut?.href || "/register")}>
+                                    <Button className="font-bold rounded-xl bg-green-600 hover:bg-green-700 text-white shadow-md hover:scale-105 transition-all">
+                                        {user ? (currentTab.ctaLoggedIn?.label || "Explore Feature") : (currentTab.ctaLoggedOut?.label || "Try This Feature Free")} <ChevronRight className="ml-1 h-4 w-4" />
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
 
-                        {/* Interactive Visual Preview Box */}
-                        <div className="lg:col-span-5 bg-card/90 rounded-2xl border border-border/80 p-6 shadow-xl">
+                        {/* Interactive Visual Preview Box - Unique for each of the 3 tabs */}
+                        <div className="lg:col-span-5 bg-card/90 rounded-2xl border border-border/80 p-6 shadow-xl min-h-[350px] flex flex-col justify-between">
                             <div className="flex items-center justify-between pb-4 border-b border-border/40">
-                                <span className="text-xs font-bold font-mono text-primary uppercase">CricVerse Preview</span>
+                                <span className="text-xs font-bold font-mono text-primary uppercase">
+                                    {activeFeatureTab === "scoring" && "CricVerse Preview • Scoring Engine"}
+                                    {activeFeatureTab === "spectate" && "CricVerse Preview • Fan Spectator"}
+                                    {activeFeatureTab === "tournaments" && "CricVerse Preview • League OS"}
+                                </span>
                                 <div className="flex gap-1.5">
                                     <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
@@ -487,24 +438,162 @@ export function LandingHero() {
                                 </div>
                             </div>
 
-                            <div className="py-6 space-y-4">
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
-                                    <span className="font-bold text-sm">Match Status</span>
-                                    <Badge className="bg-green-600 text-white font-bold">LIVE SCORING</Badge>
+                            {/* 1. LIVE SCORING & TTS PREVIEW */}
+                            {activeFeatureTab === "scoring" && (
+                                <div className="py-3 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Final • 20 Overs</div>
+                                            <div className="text-sm font-black text-foreground">Royal Challengers Vs Gujarat Titans</div>
+                                        </div>
+                                        <Badge className="bg-green-600 text-white font-bold text-[10px]">
+                                            ● LIVE SCORING
+                                        </Badge>
+                                    </div>
+
+                                    <div className="p-3 rounded-xl bg-muted/40 border border-border/40 flex items-center justify-between">
+                                        <div>
+                                            <div className="text-3xl font-black text-foreground tracking-tight">
+                                                168<span className="text-xl text-muted-foreground">/4</span>
+                                            </div>
+                                            <div className="text-xs font-semibold text-muted-foreground">Overs 18.2 • CRR 9.16</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs font-bold text-green-600">Need 14 runs</div>
+                                            <div className="text-[11px] text-muted-foreground">in 10 balls (Target 182)</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
+                                            <span>This Over (18th)</span>
+                                            <span className="font-mono text-foreground font-semibold text-xs">Bowler: J. Bumrah</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-bold">1</span>
+                                            <span className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">4</span>
+                                            <span className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-bold">0</span>
+                                            <span className="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold">6</span>
+                                            <span className="w-7 h-7 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">W</span>
+                                            <span className="w-7 h-7 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-2.5 rounded-xl bg-green-600/10 border border-green-600/20 flex items-center gap-2">
+                                        <span className="text-sm">🔊</span>
+                                        <div className="text-xs">
+                                            <span className="font-bold text-green-700 dark:text-green-400">TTS Audio: </span>
+                                            <span className="text-muted-foreground">"Over 18.2: Rohit pushes to deep cover for a single. Strike rotated!"</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
-                                    <span className="font-bold text-sm">Audio Commentary</span>
-                                    <span className="text-xs font-mono text-primary font-bold">TTS Enabled</span>
+                            )}
+
+                            {/* 2. SPECTATOR MAGIC LINK PREVIEW */}
+                            {activeFeatureTab === "spectate" && (
+                                <div className="py-3 space-y-3">
+                                    <div className="p-3 rounded-xl bg-muted/40 border border-border/40 flex items-center justify-between">
+                                        <div>
+                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Unique Magic Code</div>
+                                            <div className="font-mono text-base font-black text-primary">CV-A9X2K</div>
+                                        </div>
+                                        <Badge className="bg-primary/10 text-primary border border-primary/20 text-xs font-bold">
+                                            Zero-Login Link
+                                        </Badge>
+                                    </div>
+
+                                    <div className="p-3 rounded-xl bg-muted/40 border border-border/40 space-y-1">
+                                        <div className="flex items-center justify-between text-xs font-bold">
+                                            <span className="flex items-center gap-1.5 text-foreground">
+                                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                                184 Spectators Watching Live
+                                            </span>
+                                            <span className="text-muted-foreground text-[11px]">Instant 1s Polling</span>
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            Fans follow ball-by-ball score updates and wagon wheels with zero login.
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                                            Live Spectator Emoji Bursts
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2">
+                                            <div className="flex items-center justify-center gap-1 p-2 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold">
+                                                <span>🔥</span> <span>142</span>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-1 p-2 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold">
+                                                <span>👏</span> <span>218</span>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-1 p-2 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold">
+                                                <span>⚡</span> <span>96</span>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-1 p-2 rounded-xl bg-muted/50 border border-border/50 text-xs font-bold">
+                                                <span>🏏</span> <span>175</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-2.5 rounded-xl bg-blue-600/10 border border-blue-600/20 text-xs flex items-center justify-between text-blue-700 dark:text-blue-400 font-semibold">
+                                        <span>📱 Share to WhatsApp / Status</span>
+                                        <span className="font-mono text-[11px]">cricverse.app/spectate/CV-A9X2K</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
-                                    <span className="font-bold text-sm">Magic Code</span>
-                                    <span className="text-xs font-mono font-bold bg-background px-2 py-1 rounded border">CV-A9X2K</span>
+                            )}
+
+                            {/* 3. TOURNAMENTS & LEAGUES PREVIEW */}
+                            {activeFeatureTab === "tournaments" && (
+                                <div className="py-3 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">Tournament OS • Standings</div>
+                                            <div className="text-sm font-black text-foreground">Premier Champions Cup 2026</div>
+                                        </div>
+                                        <Badge className="bg-orange-600 text-white font-bold text-[10px]">
+                                            AUTO NRR
+                                        </Badge>
+                                    </div>
+
+                                    <div className="rounded-xl border border-border/50 overflow-hidden text-xs">
+                                        <div className="grid grid-cols-12 bg-muted/70 p-2 font-bold text-muted-foreground text-[11px]">
+                                            <div className="col-span-5">TEAM</div>
+                                            <div className="col-span-2 text-center">P</div>
+                                            <div className="col-span-2 text-center">W</div>
+                                            <div className="col-span-3 text-right">NRR</div>
+                                        </div>
+                                        <div className="grid grid-cols-12 p-2 bg-green-600/10 border-t border-border/40 font-semibold items-center">
+                                            <div className="col-span-5 font-bold flex items-center gap-1 text-foreground">
+                                                <span className="text-green-600 font-black">1.</span> Strikers XI
+                                            </div>
+                                            <div className="col-span-2 text-center text-muted-foreground">5</div>
+                                            <div className="col-span-2 text-center font-bold text-green-600">5</div>
+                                            <div className="col-span-3 text-right font-mono font-bold text-green-600">+1.842</div>
+                                        </div>
+                                        <div className="grid grid-cols-12 p-2 bg-card border-t border-border/40 font-semibold items-center">
+                                            <div className="col-span-5 font-bold flex items-center gap-1 text-foreground">
+                                                <span className="text-muted-foreground">2.</span> Titans Club
+                                            </div>
+                                            <div className="col-span-2 text-center text-muted-foreground">5</div>
+                                            <div className="col-span-2 text-center font-bold">4</div>
+                                            <div className="col-span-3 text-right font-mono text-muted-foreground">+0.915</div>
+                                        </div>
+                                        <div className="grid grid-cols-12 p-2 bg-card border-t border-border/40 font-semibold items-center">
+                                            <div className="col-span-5 font-bold flex items-center gap-1 text-foreground">
+                                                <span className="text-muted-foreground">3.</span> Royal Kings
+                                            </div>
+                                            <div className="col-span-2 text-center text-muted-foreground">5</div>
+                                            <div className="col-span-2 text-center font-bold">3</div>
+                                            <div className="col-span-3 text-right font-mono text-muted-foreground">+0.320</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-2.5 rounded-xl bg-orange-600/10 border border-orange-600/20 text-xs flex items-center justify-between text-orange-700 dark:text-orange-400 font-medium">
+                                        <span>⚡ Net Run Rate Engine</span>
+                                        <span className="font-bold text-[11px]">Calculated down to 3 Decimals</span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
-                                    <span className="font-bold text-sm">Export Format</span>
-                                    <span className="text-xs font-mono text-muted-foreground font-semibold">Official PDF</span>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </motion.div>
@@ -540,9 +629,9 @@ export function LandingHero() {
                             <div className="h-12 w-12 rounded-2xl bg-green-600/10 text-green-600 flex items-center justify-center font-black text-xl border border-green-600/20">
                                 02
                             </div>
-                            <h3 className="text-xl font-bold">Pick Venue & Toss</h3>
+                            <h3 className="text-xl font-bold">Set Match & Toss</h3>
                             <p className="text-sm text-muted-foreground leading-relaxed">
-                                Book a box cricket turf or select a ground, set overs and match rules, and conduct the digital toss.
+                                Set overs and tournament rules, configure playing 11s, and conduct the digital coin toss.
                             </p>
                         </div>
 
@@ -625,18 +714,18 @@ export function LandingHero() {
                         Ready to Elevate Your Cricket Empire?
                     </h2>
                     <p className="text-white/80 text-base sm:text-lg max-w-2xl mx-auto">
-                        Join teams and tournament organizers across the country. Start tracking live scores and booking turfs today.
+                        Join teams and tournament organizers across the country. Start tracking live scores and running championships today.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                        <Link href="/register" replace className="w-full sm:w-auto">
+                        <Link href="/register" className="w-full sm:w-auto">
                             <Button size="lg" className="w-full sm:w-auto h-14 px-10 text-base font-black rounded-2xl bg-white text-green-800 hover:bg-green-50 shadow-xl hover:scale-105 transition-all">
                                 Create Free Account <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                         </Link>
                         <Link href="/dashboard" className="w-full sm:w-auto">
                             <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-10 text-base font-bold rounded-2xl border-2 border-white/50 bg-white/10 hover:bg-white/20 text-white transition-all">
-                                Go to Dashboard
+                                Login Your Account
                             </Button>
                         </Link>
                     </div>
@@ -654,7 +743,7 @@ export function LandingHero() {
                             <span className="text-xl font-bold tracking-tight">CricVerse</span>
                         </Link>
                         <p className="text-xs text-muted-foreground leading-relaxed">
-                            The modern cricket management operating system. Live scoring, audio commentary, league management, and venue booking.
+                            The modern cricket management operating system. Live scoring, audio commentary, and league championship management.
                         </p>
                     </div>
 
@@ -664,7 +753,7 @@ export function LandingHero() {
                             <li><Link href="/matches" className="hover:text-primary transition-colors">Live Matches & Scoring</Link></li>
                             <li><Link href="/tournaments" className="hover:text-primary transition-colors">Tournaments & Leagues</Link></li>
                             <li><Link href="/teams" className="hover:text-primary transition-colors">Teams & Roster Manager</Link></li>
-                            <li><Link href="/grounds" className="hover:text-primary transition-colors">Turf Ground Booking</Link></li>
+                            <li><Link href="/dashboard" className="hover:text-primary transition-colors">Organizer Dashboard</Link></li>
                         </ul>
                     </div>
 
@@ -674,15 +763,15 @@ export function LandingHero() {
                             <li><span className="text-foreground">TTS Voice Commentary</span></li>
                             <li><span className="text-foreground">Spectator Magic Link (CV-Code)</span></li>
                             <li><span className="text-foreground">Official PDF Match Reports</span></li>
-                            <li><Link href="/store" className="hover:text-primary transition-colors">CricVerse Store</Link></li>
+                            <li><span className="text-foreground">Automated NRR Points Table</span></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold text-sm mb-4">Get Started</h4>
                         <ul className="space-y-2.5 text-xs text-muted-foreground font-medium">
-                            <li><Link href="/login" replace className="hover:text-primary transition-colors">Sign In</Link></li>
-                            <li><Link href="/register" replace className="hover:text-primary transition-colors">Create Account</Link></li>
+                            <li><Link href="/login" className="hover:text-primary transition-colors">Sign In</Link></li>
+                            <li><Link href="/register" className="hover:text-primary transition-colors">Create Account</Link></li>
                             <li><a href="#faq" className="hover:text-primary transition-colors">Help & FAQ</a></li>
                         </ul>
                     </div>
