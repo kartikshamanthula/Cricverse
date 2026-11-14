@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET || 'cV3rS3cr3tK3y!2024#CricVerseApp$Secure';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-export async function middleware(request) {
+export async function proxy(request) {
     const { pathname } = request.nextUrl;
 
     // 0. The root landing page is always 100% public — never redirect or block '/'
@@ -65,6 +65,9 @@ export async function middleware(request) {
     return NextResponse.next();
 }
 
+// Backward-compatible alias for any internal runner expecting middleware
+export { proxy as middleware };
+
 export const config = {
     matcher: [
         '/login',
@@ -79,4 +82,3 @@ export const config = {
         '/matches/create',
     ],
 };
-
